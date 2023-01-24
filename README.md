@@ -1,2 +1,2 @@
 # Attendance-Management
-Automated Attendance using Face Recognition and Firebase
+Automated Attendance using Face Recognition
