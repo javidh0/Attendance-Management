@@ -1,7 +1,8 @@
 import pyrebase as pb
 
 class FireBase:
-    __config = firebaseConfig = {
+    __dataBase = None
+    __config = {
     "apiKey": "AIzaSyBk-trGoXiH-alr7TXC9p8v6OXGBgWHrfE",
     "authDomain": "attendance-management-8277c.firebaseapp.com",
     "databaseURL": "https://attendance-management-8277c-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -12,3 +13,8 @@ class FireBase:
     "measurementId": "G-Y019WT9CFF",
     "databaseURL" : "https://attendance-management-8277c-default-rtdb.asia-southeast1.firebasedatabase.app/"
     }
+
+    def initialize(self):
+        fb = pb.initialize_app(self.__config)
+        self.__dataBase = fb.database()
+
