@@ -17,7 +17,10 @@ class FireBase:
     def initialize(self):
         fb = pb.initialize_app(self.__config)
         self.__dataBase = fb.database()
-        
+
     def Push(self, path:str, data:dict):
         self.__dataBase.child(path).set(data)
+
+    def Get(self, path:str) -> dict:
+        return self.__dataBase.child(path).get().val()
 
