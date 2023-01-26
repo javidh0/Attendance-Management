@@ -1,5 +1,6 @@
 import pyrebase as pb
 import face_recognition
+import time
 import cv2
 
 class FireBase:
@@ -30,23 +31,39 @@ class FireBase:
         return tuple(temp)
 
 class Attendance:
-    pass
+    def Record(self, id:str):
+        print("Attendance Recorded -> "+id)
 
 class FaceRecog:
 
     __TrainedList:list = None
+    __ID = ["Javidh", "Elon Musk"]
 
     def __init__(self) -> None:
         self.__TrainedList = self.Train(["data\RA148.jpeg", "data\RA002.jpg"])
+    
+    def PlotFace(self, img):
+        try:
+            loc = face_recognition.face_locations(img)[0]
+            cv2.rectangle(img, (loc[0], loc[3]), (loc[2], loc[1]), (225,0,255), 2)
+        except:
+            pass
 
-    def Train(self, images:list[str]) -> list:                  #images arg (List of location of imageData of students)
+    def evaluate(self, results:list):
+        for i in range(len(results)):
+            if results[i]:
+                at = Attendance()
+                at.Record(self.__ID[i])
+                return True
+
+    def Train(self, images:list[str]) -> list:                  
         encodedList = []  
         for x in images:
             img = face_recognition.load_image_file(x)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             encd = face_recognition.face_encodings(img)[0]
-            encodedList.append(encd)    #encode the image and add it to a list
-        return encodedList              #returns the encoded list
+            encodedList.append(encd)
+        return encodedList    
     
     def Test(self, img, trainedList):                      
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -65,4 +82,5 @@ class FaceRecog:
             check, frame = cam.read()
             self.PlotFace(frame)
             result = self.Test(frame, self.__TrainedList)
-            print(result)
+            if self.evaluate(result):
+                time.sleep(3)
