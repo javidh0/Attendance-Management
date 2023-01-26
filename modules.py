@@ -39,13 +39,6 @@ class FaceRecog:
     def __init__(self) -> None:
         self.__TrainedList = self.Train(["data\RA148.jpeg", "data\RA002.jpg"])
 
-    def PlotFace(self, img):
-        try:
-            loc = face_recognition.face_locations(img)[0]
-            cv2.rectangle(img, (loc[0], loc[3]), (loc[2], loc[1]), (225,0,255), 2)
-        except:
-            pass
-
     def Train(self, images:list[str]) -> list:                  #images arg (List of location of imageData of students)
         encodedList = []  
         for x in images:
