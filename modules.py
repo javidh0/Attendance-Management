@@ -37,7 +37,8 @@ class FaceRecog:
     __TrainedList:list = None
 
     def __init__(self) -> None:
-        pass
+        self.__TrainedList = self.Train()
+        
     def Train(self, images:list[str]) -> list:                  #images arg (List of location of imageData of students)
         encodedList = []  
         for x in images:
@@ -62,3 +63,4 @@ class FaceRecog:
         print("Camera On..")
         check, frame = cam.read()
         result = self.Test(frame, self.__TrainedList)
+        return result
