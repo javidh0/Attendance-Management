@@ -1,4 +1,6 @@
 import pyrebase as pb
+import face_recognition
+import cv2
 
 class FireBase:
     __dataBase = None
@@ -29,3 +31,24 @@ class FireBase:
 
 class Attendance:
     pass
+
+class FaceRecog:
+
+    def Train(self, images:list[str]) -> list:                  #images arg (List of location of imageData of students)
+        encodedList = []  
+        for x in images:
+            img = face_recognition.load_image_file(x)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            encd = face_recognition.face_encodings(img)[0]
+            encodedList.append(encd)    #encode the image and add it to a list
+        return encodedList              #returns the encoded list
+    
+    def Test(img, trainedList):                      
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        try:
+            encoed = face_recognition.face_encodings(img)[0]
+            results = face_recognition.compare_faces(trainedList, encoed)
+            return results
+        except:
+            return []
+    
