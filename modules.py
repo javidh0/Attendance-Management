@@ -24,3 +24,6 @@ class FireBase:
     def Get(self, path:str) -> dict:
         return self.__dataBase.child(path).get().val()
 
+    
+class Attendance:
+    pass
