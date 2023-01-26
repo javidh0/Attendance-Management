@@ -37,7 +37,7 @@ class FaceRecog:
     __TrainedList:list = None
 
     def __init__(self) -> None:
-        self.__TrainedList = self.Train(["data\RA148.jpeg"])
+        self.__TrainedList = self.Train(["data\RA148.jpeg", "data\RA002.jpg"])
 
     def PlotFace(self, img):
         try:
