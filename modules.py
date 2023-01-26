@@ -37,8 +37,15 @@ class FaceRecog:
     __TrainedList:list = None
 
     def __init__(self) -> None:
-        self.__TrainedList = self.Train()
-        
+        self.__TrainedList = self.Train(["data\RA148.jpeg"])
+
+    def PlotFace(self, img):
+        try:
+            loc = face_recognition.face_locations(img)[0]
+            cv2.rectangle(img, (loc[0], loc[3]), (loc[2], loc[1]), (225,0,255), 2)
+        except:
+            pass
+
     def Train(self, images:list[str]) -> list:                  #images arg (List of location of imageData of students)
         encodedList = []  
         for x in images:
@@ -48,7 +55,7 @@ class FaceRecog:
             encodedList.append(encd)    #encode the image and add it to a list
         return encodedList              #returns the encoded list
     
-    def Test(img, trainedList):                      
+    def Test(self, img, trainedList):                      
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         try:
             encoed = face_recognition.face_encodings(img)[0]
@@ -61,6 +68,8 @@ class FaceRecog:
 
         cam = cv2.VideoCapture(0)
         print("Camera On..")
-        check, frame = cam.read()
-        result = self.Test(frame, self.__TrainedList)
-        return result
+        while True:
+            check, frame = cam.read()
+            self.PlotFace(frame)
+            result = self.Test(frame, self.__TrainedList)
+            print(result)
