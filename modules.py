@@ -34,6 +34,10 @@ class Attendance:
 
 class FaceRecog:
 
+    __TrainedList:list = None
+
+    def __init__(self) -> None:
+        pass
     def Train(self, images:list[str]) -> list:                  #images arg (List of location of imageData of students)
         encodedList = []  
         for x in images:
@@ -52,3 +56,9 @@ class FaceRecog:
         except:
             return []
     
+    def initialize(self):
+
+        cam = cv2.VideoCapture(0)
+        print("Camera On..")
+        check, frame = cam.read()
+        result = self.Test(frame, self.__TrainedList)
