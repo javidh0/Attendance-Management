@@ -32,7 +32,7 @@ class FireBase:
 
 class Attendance:
     def Record(self, id:str):
-        print("Attendance Recorded -> "+id)
+        print("Attendance Recorded in DataBase -> "+id)
 
 class FaceRecog:
 
