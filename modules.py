@@ -23,7 +23,9 @@ class FireBase:
 
     def Get(self, path:str) -> dict:
         return self.__dataBase.child(path).get().val()
+    def GetStudents(self, Class:str) -> tuple:
+        temp = self.__dataBase.child("Class").child(Class).child("Students").get().val()
+        return tuple(temp)
 
-    
 class Attendance:
     pass
