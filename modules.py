@@ -1,7 +1,25 @@
 import pyrebase as pb
+import string
 import face_recognition
 import time
 import cv2
+import random
+
+class Hash:
+    __aph = string.ascii_lowercase
+    __num = list(map(str, range(0,10)))
+    __sym = "!@#$%^&*()"
+    __code = ''
+    
+    def GenerateCode(self, FBobj):
+        dta = FBobj.getHash()
+        self.__code = ''
+        self.__code += ( random.choice(self.__aph) + random.choice(self.__aph) + random.choice(self.__aph) )
+        self.__code += ( random.choice(self.__num) + random.choice(self.__num) )
+        self.__code += random.choice(self.__sym)
+        if self.__code in dta:
+            self.GenerateCode()
+        return self.__code 
 
 class FireBase:
     __dataBase = None
@@ -26,13 +44,21 @@ class FireBase:
 
     def Get(self, path:str) -> dict:
         return self.__dataBase.child(path).get().val()
+
     def GetStudents(self, Class:str) -> tuple:
         temp = self.__dataBase.child("Class").child(Class).child("Students").get().val()
         return tuple(temp)
+    
+    def GetHash(self) -> tuple:
+        temp = self.__dataBase.child("Hash").get().val()
+        return tuple(temp)
 
 class Attendance:
-    def Record(self, id:str):
-        print("Attendance Recorded in DataBase -> "+id)
+    __FBobj:FireBase = None
+    def __init__(self, obj:FireBase) -> None:
+        self.__FBobj = obj
+    def __getHash(self):
+        pass
 
 class FaceRecog:
 
