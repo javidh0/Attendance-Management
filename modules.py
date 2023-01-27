@@ -50,6 +50,15 @@ class FireBase:
             pass
         lst.append(value)
         self.__dataBase.child(path1).child(path2).set({path3:lst})
+    
+    def CreateAttendance(self, path1:str, path2:str, path3:str, value:str):
+        lst = []
+        try:
+            lst = list(self.__dataBase.child(path1).child(path2).child(path3).get().val())
+        except:
+            pass
+        lst.append(value)
+        self.__dataBase.child(path1).child(path2).set({path3:lst})
 
     def Push(self, path1:str,path2:str, data:dict):
         self.__dataBase.child(path1).child(path2).set(data)
@@ -79,8 +88,6 @@ class Attendance:
         self.__FBobj.AppendValue("meta", "FacultyID", self.__FacultyID, hc)
         self.__FBobj.AppendValue("meta", "Subject", self.__Subject, hc)
 
-    def __getHash(self):
-        hc = Hash().GenerateCode(self.__FBobj)
 
 class FaceRecog:
 
