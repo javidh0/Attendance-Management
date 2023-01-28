@@ -51,14 +51,18 @@ class FireBase:
         lst.append(value)
         self.__dataBase.child(path1).child(path2).set({path3:lst})
     
-    def CreateAttendance(self, path1:str, path2:str, path3:str, value:str):
-        lst = []
-        try:
-            lst = list(self.__dataBase.child(path1).child(path2).child(path3).get().val())
-        except:
-            pass
-        lst.append(value)
-        self.__dataBase.child(path1).child(path2).set({path3:lst})
+    def CreateAttendance(self, hash:str, students:tuple):
+        if hash in self.GetHash():
+            print("Hash Error: Hash already exist")
+            return None
+        dct = {
+            hash:{
+
+            }
+        }
+        for stu in students:
+            dct[hash][stu] = 'A'
+        self.__dataBase.child("Attendance").set(dct)
 
     def Push(self, path1:str,path2:str, data:dict):
         self.__dataBase.child(path1).child(path2).set(data)
@@ -77,9 +81,11 @@ class FireBase:
 class Attendance:
     __FBobj:FireBase = None
     __Subject:str = None
+    __Class:str = None
     __FacultyID:str = None
-    def __init__(self, obj:FireBase, Subject:str, FacultyID:str) -> None:
+    def __init__(self, obj:FireBase, Subject:str, FacultyID:str, Class:str) -> None:
         self.__FBobj = obj
+        self.__Class = Class
         self.__Subject = Subject
         self.__FacultyID = FacultyID
         date = str(datetime.datetime.fromtimestamp(time.time()))[:10]
@@ -87,6 +93,7 @@ class Attendance:
         self.__FBobj.AppendValue("meta", "Date", date, hc)
         self.__FBobj.AppendValue("meta", "FacultyID", self.__FacultyID, hc)
         self.__FBobj.AppendValue("meta", "Subject", self.__Subject, hc)
+        self.__FBobj.CreateAttendance(hc, self.__FBobj.GetStudents(self.__Class))
 
 
 class FaceRecog:
