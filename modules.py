@@ -63,6 +63,12 @@ class FireBase:
         for stu in students:
             dct[hash][stu] = 'A'
         self.__dataBase.child("Attendance").set(dct)
+    
+    def UpdateAttendance(self, hash:str, student:str, state:str):
+        if not (state == 'A' or state == 'P'):
+            print("Error : Invalid Key :"+state)
+            return
+        self.__dataBase.child("Attendance").child(hash).update({student:state})
 
     def Push(self, path1:str,path2:str, data:dict):
         self.__dataBase.child(path1).child(path2).set(data)
@@ -77,12 +83,18 @@ class FireBase:
     def GetHash(self) -> tuple:
         temp = self.__dataBase.child("Hash").get().val()
         return tuple(temp)
+    
+    def AddHash(self, hash:str):
+        lst = list(self.__dataBase.child("Hash").get().val())
+        lst.append(hash)
+        self.__dataBase.child("Hash").update({"Hash":lst})
 
 class Attendance:
     __FBobj:FireBase = None
     __Subject:str = None
     __Class:str = None
     __FacultyID:str = None
+    __Hash:str = None
     def __init__(self, obj:FireBase, Subject:str, FacultyID:str, Class:str) -> None:
         self.__FBobj = obj
         self.__Class = Class
@@ -90,10 +102,14 @@ class Attendance:
         self.__FacultyID = FacultyID
         date = str(datetime.datetime.fromtimestamp(time.time()))[:10]
         hc = Hash().GenerateCode(self.__FBobj)
+        self.__Hash = hc
         self.__FBobj.AppendValue("meta", "Date", date, hc)
         self.__FBobj.AppendValue("meta", "FacultyID", self.__FacultyID, hc)
         self.__FBobj.AppendValue("meta", "Subject", self.__Subject, hc)
+        self.__FBobj.AddHash(hc)
         self.__FBobj.CreateAttendance(hc, self.__FBobj.GetStudents(self.__Class))
+    def MarkPresent(self, student:str):
+        self.__FBobj.UpdateAttendance(self.__Hash, student, 'P')
 
 
 class FaceRecog:
