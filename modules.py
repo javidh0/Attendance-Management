@@ -5,6 +5,7 @@ import time
 import cv2
 import random
 import datetime
+import serial as se
 
 print(str(datetime.datetime.fromtimestamp(time.time()))[:10])
 
@@ -111,7 +112,6 @@ class Attendance:
     def MarkPresent(self, student:str):
         self.__FBobj.UpdateAttendance(self.__Hash, student, 'P')
 
-
 class FaceRecog:
 
     __TrainedList:list = None
@@ -162,3 +162,25 @@ class FaceRecog:
             result = self.Test(frame, self.__TrainedList)
             if self.evaluate(result):
                 time.sleep(3)
+
+class Ardunio:
+    __Port:str = None
+    __Conn:se.Serial = None 
+
+    def __init__(self, Port:str) -> None:
+        self.__Port = Port
+    
+    def Connect(self) -> bool:
+        try:
+            com = se.Serial(self.__Port, baudrate=9600)
+            return True
+        except:
+            return False
+    
+    def read(self) -> str:
+        self.__Conn.write(b'r')
+        for x in range(5):
+            temp =  self.__Conn.readline().decode('utf-8')
+            if(temp!=''):
+                return temp
+        return None
