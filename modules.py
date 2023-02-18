@@ -89,14 +89,15 @@ class FireBase:
         lst.append(hash)
         self.__dataBase.child("Hash").set(lst)
     
-    def SPush(self, file, name):
+    def __SPush(self):
+        tup = ("RA2111026010148", "RA2111026010176", "RA2111026010177", "RA2111026010186", "RA2111026010197", "RA2111026010202")
+        for img in tup:
+            self.__Storage.child(img).put("data\\"+img+'.jpeg')
         
-        self.__Storage.child(name).put(file)
-    
-    def GetImages(self, img):
+    def GetImages(self, imgList):
         for x in self.__Storage.list_files():
-            if str(x.name) == img:
-                x.download_to_filename("ImageFolder//"+str(x.name))
+            if str(x.name) in imgList:
+                x.download_to_filename("Images\\"+str(x.name))
 
 class Attendance:
     __FBobj:FireBase = None
