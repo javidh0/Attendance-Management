@@ -176,6 +176,9 @@ class Ardunio:
             return True
         except:
             return False
+        
+    def Disconnect(self):
+        self.__Conn.close()
     
     def read(self) -> str:
         self.__Conn.write(b'r')
