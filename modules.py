@@ -36,7 +36,8 @@ class FireBase:
     "messagingSenderId": "393696014722",
     "appId": "1:393696014722:web:ac2d77466297c64c671f9b",
     "measurementId": "G-Y019WT9CFF",
-    "databaseURL" : "https://attendance-management-8277c-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    "databaseURL" : "https://attendance-management-8277c-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    "serviceAccount": "serviceAccountKey.json"
     }
 
     def initialize(self):
@@ -50,20 +51,20 @@ class FireBase:
         except:
             pass
         lst.append(value)
-        self.__dataBase.child(path1).child(path2).set({path3:lst})
+        print(lst)
+        self.__dataBase.child(path1).child(path2).child(path3).set(lst)
+
     
     def CreateAttendance(self, hash:str, students:tuple):
         if hash in self.GetHash():
             print("Hash Error: Hash already exist")
             return None
+        
         dct = {
-            hash:{
-
-            }
         }
         for stu in students:
-            dct[hash][stu] = 'A'
-        self.__dataBase.child("Attendance").set(dct)
+            dct[stu] = 'A'
+        self.__dataBase.child("Attendance").child(hash).set(dct)
     
     def UpdateAttendance(self, hash:str, student:str, state:str):
         if not (state == 'A' or state == 'P'):
