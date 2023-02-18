@@ -90,11 +90,13 @@ class FireBase:
         self.__dataBase.child("Hash").set(lst)
     
     def SPush(self, file, name):
-        self.__Storage.child("TestFolder").child(name).put(file)
+        
+        self.__Storage.child(name).put(file)
     
-    def GetImages(self, Class:tuple):
-        for img in Class:
-            self.__Storage.child("TestFolder").child(img).download("data\\"+img)
+    def GetImages(self, img):
+        for x in self.__Storage.list_files():
+            if str(x.name) == img:
+                x.download_to_filename("ImageFolder"+str(x.name))
 
 class Attendance:
     __FBobj:FireBase = None
