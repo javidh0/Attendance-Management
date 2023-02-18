@@ -26,6 +26,7 @@ class Hash:
         return self.__code 
 
 class FireBase:
+    __Storage = None
     __dataBase = None
     __config = {
     "apiKey": "AIzaSyBk-trGoXiH-alr7TXC9p8v6OXGBgWHrfE",
@@ -43,6 +44,7 @@ class FireBase:
     def initialize(self):
         fb = pb.initialize_app(self.__config)
         self.__dataBase = fb.database()
+        self.__Storage = fb.storage()
     
     def AppendValue(self, path1:str, path2:str, path3:str, value:str):
         lst = []
@@ -55,11 +57,7 @@ class FireBase:
         self.__dataBase.child(path1).child(path2).child(path3).set(lst)
 
     
-    def CreateAttendance(self, hash:str, students:tuple):
-        if hash in self.GetHash():
-            print("Hash Error: Hash already exist")
-            return None
-        
+    def CreateAttendance(self, hash:str, students:tuple):    
         dct = {
         }
         for stu in students:
@@ -89,7 +87,14 @@ class FireBase:
     def AddHash(self, hash:str):
         lst = list(self.__dataBase.child("Hash").get().val())
         lst.append(hash)
-        self.__dataBase.child("Hash").update({"Hash":lst})
+        self.__dataBase.child("Hash").set(lst)
+    
+    def SPush(self, file, name):
+        self.__Storage.child("TestFolder").child(name).put(file)
+    
+    def GetImages(self, Class:tuple):
+        for img in Class:
+            self.__Storage.child("TestFolder").child(img).download("data\\"+img)
 
 class Attendance:
     __FBobj:FireBase = None
@@ -114,7 +119,7 @@ class Attendance:
         self.__FBobj.UpdateAttendance(self.__Hash, student, 'P')
 
 class FaceRecog:
-
+    
     __TrainedList:list = None
     __ID = ["Javidh", "Elon Musk"]
 
