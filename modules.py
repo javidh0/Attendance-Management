@@ -96,7 +96,7 @@ class FireBase:
     def GetImages(self, img):
         for x in self.__Storage.list_files():
             if str(x.name) == img:
-                x.download_to_filename("ImageFolder"+str(x.name))
+                x.download_to_filename("ImageFolder//"+str(x.name))
 
 class Attendance:
     __FBobj:FireBase = None
