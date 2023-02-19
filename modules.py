@@ -10,6 +10,7 @@ import os
 import serial as se
 from tkinter import *
 import pyautogui as pyg
+from tkinter import ttk
 
 print(str(datetime.datetime.fromtimestamp(time.time()))[:10])
 
@@ -107,6 +108,10 @@ class FireBase:
         for x in self.__Storage.list_files():
             if str(x.name) in imgList:
                 x.download_to_filename("Images\\"+str(x.name))
+    
+    def GetClass(self):
+        temp:dict = self.__dataBase.child("Class").get().val()
+        return tuple(temp.keys())
 
 class Attendance:
     __FBobj:FireBase = None
@@ -214,6 +219,7 @@ class Window:
     __root:Tk  = None
     __mainFrm:LabelFrame = None
     __font = ("Consolas", 15)
+    __FbObj:FireBase = None
     def __init__(self) -> None:
         pyg
         self.__root = Tk()
@@ -223,12 +229,26 @@ class Window:
         self.__root.geometry('%dx%d'%(width, height))
         self.__mainFrm = LabelFrame(self.__root)
         self.__mainFrm.place(relx=0.5, rely=0.5, anchor=CENTER, relwidth=0.99, relheight=0.99)
+        self.__FbObj = FireBase()
+        self.__FbObj.initialize()
 
     def __CreateAttendanceWindow(self):
-        pass
+        def Create(Subject, FacultyID, Class):
+            print(Subject, FacultyID, Class)
+            #self.Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
+        ClassId = self.__FbObj.GetClass()
+        n = StringVar()
+        ttk.Combobox(self.__mainFrm, values=ClassId, textvariable=n, width=20, font=self.__font).pack(pady=10)
+        Subject_Code = ttk.Entry(self.__mainFrm, width=20, font=self.__font)
+        Subject_Code.pack(pady=10)
+        Subject_Code.insert(0, 'Subject Code')
+        FacultyId = ttk.Entry(self.__mainFrm, width=20, font=self.__font)
+        FacultyId.pack(pady=10)
+        FacultyId.insert(0, 'Faculty Id')
+        Button(self.__mainFrm, text="--OK--", font=self.__font, command=lambda: Create(Subject_Code.get(), FacultyId.get(), n.get())).pack(pady=10)
     
     def MainWindow(self):
-        Button(self.__root, text="Create Attendance", font=self.__font, command=self.__CreateAttendanceWindow).pack()
+        Button(self.__mainFrm, text="Create Attendance", font=self.__font, command=self.__CreateAttendanceWindow).pack(pady=10)
 
     def enable(self):
         self.__root.mainloop()
