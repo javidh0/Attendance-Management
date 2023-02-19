@@ -191,7 +191,6 @@ class Ardunio:
     def Connect(self) -> bool:
         try:
             self.__Conn = se.Serial(self.__Port, baudrate=9600, timeout=0)
-            self.__Conn.open()           
             return True
         except:
             return False
