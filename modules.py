@@ -8,6 +8,8 @@ import smtplib
 import datetime
 import os
 import serial as se
+from tkinter import *
+import pyautogui as pyg
 
 print(str(datetime.datetime.fromtimestamp(time.time()))[:10])
 
@@ -207,3 +209,26 @@ class Ardunio:
                 return temp
         
         return None
+    
+class Window:
+    __root:Tk  = None
+    __mainFrm:LabelFrame = None
+    __font = ("Consolas", 15)
+    def __init__(self) -> None:
+        pyg
+        self.__root = Tk()
+        self.__root.title("<<Title>>")
+        width = self.__root.winfo_screenwidth() - 50   
+        height = self.__root.winfo_screenheight() - 50
+        self.__root.geometry('%dx%d'%(width, height))
+        self.__mainFrm = LabelFrame(self.__root)
+        self.__mainFrm.place(relx=0.5, rely=0.5, anchor=CENTER, relwidth=0.99, relheight=0.99)
+
+    def __CreateAttendanceWindow(self):
+        pass
+    
+    def MainWindow(self):
+        Button(self.__root, text="Create Attendance", font=self.__font, command=self.__CreateAttendanceWindow).pack()
+
+    def enable(self):
+        self.__root.mainloop()
