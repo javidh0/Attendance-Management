@@ -127,14 +127,20 @@ class Attendance:
         self.__FBobj.CreateAttendance(hc, self.__FBobj.GetStudents(self.__Class))
     def MarkPresent(self, student:str):
         self.__FBobj.UpdateAttendance(self.__Hash, student, 'P')
+    def Record(self, x):
+        print(x)
 
 class FaceRecog:
 
     __TrainedList:list = None
-    __ID = ["Javidh", "Elon Musk"]
+    __ID = os.listdir("Images")
+
+    FunAdd = lambda self, a : "Images\\"+a
 
     def __init__(self) -> None:
-        self.__TrainedList = self.Train(["data\RA148.jpeg", "data\RA002.jpg"])
+        self.__TrainedList = self.Train(tuple(map(self.FunAdd, self.__ID)))
+        self.__cam = cv2.VideoCapture(0)
+        print("Camera On..")
     
     def PlotFace(self, img):
         try:
@@ -146,9 +152,7 @@ class FaceRecog:
     def evaluate(self, results:list):
         for i in range(len(results)):
             if results[i]:
-                at = Attendance()
-                at.Record(self.__ID[i])
-                return True
+                return [True, self.__ID[i]]
 
     def Train(self, images:list[str]) -> list:                  
         encodedList = []  
@@ -170,14 +174,13 @@ class FaceRecog:
     
     def initialize(self):
 
-        cam = cv2.VideoCapture(0)
-        print("Camera On..")
-        while True:
-            check, frame = cam.read()
-            self.PlotFace(frame)
-            result = self.Test(frame, self.__TrainedList)
-            if self.evaluate(result):
-                time.sleep(3)
+        check, frame = self.__cam.read()
+        self.PlotFace(frame)
+        result = self.Test(frame, self.__TrainedList)
+        got = self.evaluate(result)
+        if got[0]:
+            time.sleep(1)
+            return got[1]
 
 class Ardunio:
     __Port:str = None
