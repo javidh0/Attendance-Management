@@ -11,7 +11,7 @@ import serial as se
 print(str(datetime.datetime.fromtimestamp(time.time()))[:10])
 
 class Mail:
-    def __init__(self, toMail, message) -> None:
+    def send(self, toMail:list, message) -> None:
         s = smtplib.SMTP('smtp.gmail.com', 587)
         s.starttls()
         s.login("javidh123456789@gmail.com", "yhssozhjtvkvwdxw")
