@@ -173,7 +173,6 @@ class FaceRecog:
             return []
     
     def initialize(self):
-
         check, frame = self.__cam.read()
         self.PlotFace(frame)
         result = self.Test(frame, self.__TrainedList)
@@ -191,7 +190,8 @@ class Ardunio:
     
     def Connect(self) -> bool:
         try:
-            com = se.Serial(self.__Port, baudrate=9600)
+            self.__Conn = se.Serial(self.__Port, baudrate=9600, timeout=0)
+            self.__Conn.open()           
             return True
         except:
             return False
@@ -200,9 +200,11 @@ class Ardunio:
         self.__Conn.close()
     
     def read(self) -> str:
-        self.__Conn.write(b'r')
+        self.__Conn.write(b"r")
+        time.sleep(0.2)
+        temp =  self.__Conn.read_all().decode('utf-8')
         for x in range(5):
-            temp =  self.__Conn.readline().decode('utf-8')
             if(temp!=''):
                 return temp
+        
         return None
