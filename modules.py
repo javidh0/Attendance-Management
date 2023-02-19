@@ -6,6 +6,7 @@ import cv2
 import random
 import smtplib
 import datetime
+import os
 import serial as se
 
 print(str(datetime.datetime.fromtimestamp(time.time()))[:10])
@@ -97,13 +98,10 @@ class FireBase:
         lst = list(self.__dataBase.child("Hash").get().val())
         lst.append(hash)
         self.__dataBase.child("Hash").set(lst)
-    
-    def __SPush(self):
-        tup = ("RA2111026010148", "RA2111026010176", "RA2111026010177", "RA2111026010186", "RA2111026010197", "RA2111026010202")
-        for img in tup:
-            self.__Storage.child(img).put("data\\"+img+'.jpeg')
         
     def GetImages(self, imgList):
+        for x in os.listdir('Images'):
+            os.remove("Images\\"+x)
         for x in self.__Storage.list_files():
             if str(x.name) in imgList:
                 x.download_to_filename("Images\\"+str(x.name))
@@ -131,7 +129,7 @@ class Attendance:
         self.__FBobj.UpdateAttendance(self.__Hash, student, 'P')
 
 class FaceRecog:
-    
+
     __TrainedList:list = None
     __ID = ["Javidh", "Elon Musk"]
 
