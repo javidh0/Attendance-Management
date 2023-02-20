@@ -84,6 +84,7 @@ class FireBase:
         if not (state == 'A' or state == 'P'):
             print("Error : Invalid Key :"+state)
             return
+        print(self.__dataBase.child("Attendance").child(hash).child(student).get().val())
         self.__dataBase.child("Attendance").child(hash).update({student:state})
 
     def Push(self, path1:str,path2:str, data:dict):
@@ -141,6 +142,8 @@ class Attendance:
         self.__FBobj.UpdateAttendance(self.__Hash, student, 'P')
     def Record(self, x):
         print(x)
+    def GetTitle(self):
+        return str(self.__Class) +" "+ str(self.__Subject)
 
 class FaceRecog:
 
@@ -194,6 +197,7 @@ class FaceRecog:
         if got[0]:
             time.sleep(1)
             return got[1]
+        return None
 
 class Ardunio:
     __Port:str = None
@@ -227,6 +231,8 @@ class Window:
     __mainFrm:LabelFrame = None
     __font = ("Consolas", 15)
     __FbObj:FireBase = None
+    __Attendance:Attendance = None
+    __FbObj:FireBase = None
     def __init__(self) -> None:
         pyg
         self.__root = Tk()
@@ -239,12 +245,34 @@ class Window:
         self.__FbObj = FireBase()
         self.__FbObj.initialize()
 
+    def __AttenadanceWindow(self):
+        def Clr():
+            for i in at_root.winfo_children():
+                i.destroy()
+        at_root = Tk()
+        at_root.title()
+        tit = self.__Attendance.GetTitle()
+        at_root.title(tit)
+        width = self.__root.winfo_screenwidth() - 500   
+        height = self.__root.winfo_screenheight() - 50
+        at_root.geometry('%dx%d'%(width, height))
+        while True:
+            at_root.update()
+            id = self.__FbObj.initialize()
+            if id != None:
+                Clr()
+                Label(at_root, text=id, font=self.__font).pack(pady=10, padx=10)
+                self.__Attendance.MarkPresent(id)
+                Label(at_root, text="Marked Present", font=self.__font).pack(padx=10, pady=10)
+
+        at_root.mainloop()
+
     def __CreateAttendanceWindow(self):
         def Create(Subject, FacultyID, Class):
             print(Subject, FacultyID, Class)
             self.__Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
             self.__FaceObj = FaceRecog()
-            self.__FaceObj.initialize()
+            
         ClassId = self.__FbObj.GetClass()
         n = StringVar()
         ttk.Combobox(self.__mainFrm, values=ClassId, textvariable=n, width=20, font=self.__font).pack(pady=10)
