@@ -154,6 +154,9 @@ class FaceRecog:
     FunAdd = lambda self, a : "Images\\"+a
 
     def __init__(self) -> None:
+        pass
+
+    def start(self):
         self.__TrainedList = self.Train(tuple(map(self.FunAdd, self.__ID)))
         self.__cam = cv2.VideoCapture(0)
         self.__Rfid = Ardunio("COM3")
@@ -270,13 +273,14 @@ class Window:
                 at_root.update()
             
         at_root.mainloop()
-
+    def Create(self, Subject, FacultyID, Class):
+        print(Subject, FacultyID, Class)
+        self.__Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
+        self.__FaceObj = FaceRecog()
+        self.__FaceObj.start()
+        Button(self.__mainFrm, text="Take Attendace", font=self.__font, command=self.__AttenadanceWindow).pack(pady=10)
+        
     def __CreateAttendanceWindow(self):
-        def Create(Subject, FacultyID, Class):
-            print(Subject, FacultyID, Class)
-            self.__Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
-            self.__FaceObj = FaceRecog()
-            Button(self.__mainFrm, text="Take Attendace", font=self.__font, command=self.__AttenadanceWindow).pack(pady=10)
             
         ClassId = self.__FbObj.GetClass()
         n = StringVar()
@@ -287,7 +291,7 @@ class Window:
         FacultyId = ttk.Entry(self.__mainFrm, width=20, font=self.__font)
         FacultyId.pack(pady=10)
         FacultyId.insert(0, 'Faculty Id')
-        Button(self.__mainFrm, text="--OK--", font=self.__font, command=lambda: Create(Subject_Code.get(), FacultyId.get(), n.get())).pack(pady=10)
+        Button(self.__mainFrm, text="--OK--", font=self.__font, command=lambda: self.Create(Subject_Code.get(), FacultyId.get(), n.get())).pack(pady=10)
     
     def MainWindow(self):
         Button(self.__mainFrm, text="Create Attendance", font=self.__font, command=self.__CreateAttendanceWindow).pack(pady=10)
