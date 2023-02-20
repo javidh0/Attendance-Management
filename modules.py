@@ -229,7 +229,7 @@ class Ardunio:
 class Window:
     __root:Tk  = None
     __mainFrm:LabelFrame = None
-    __font = ("Consolas", 15)
+    __font = ("Consolas", 17)
     __FbObj:FireBase = None
     __Attendance:Attendance = None
     __FbObj:FireBase = None
@@ -238,7 +238,7 @@ class Window:
         self.__root = Tk()
         self.__root.title("<<Title>>")
         width = self.__root.winfo_screenwidth() - 50   
-        height = self.__root.winfo_screenheight() - 50
+        height = self.__root.winfo_screenheight() - 500
         self.__root.geometry('%dx%d'%(width, height))
         self.__mainFrm = LabelFrame(self.__root)
         self.__mainFrm.place(relx=0.5, rely=0.5, anchor=CENTER, relwidth=0.99, relheight=0.99)
@@ -259,12 +259,16 @@ class Window:
         while True:
             at_root.update()
             id = self.__FbObj.initialize()
+            at_root.update()
             if id != None:
                 Clr()
                 Label(at_root, text=id, font=self.__font).pack(pady=10, padx=10)
+                at_root.update()
                 self.__Attendance.MarkPresent(id)
+                at_root.update()
                 Label(at_root, text="Marked Present", font=self.__font).pack(padx=10, pady=10)
-
+                at_root.update()
+            
         at_root.mainloop()
 
     def __CreateAttendanceWindow(self):
@@ -272,6 +276,7 @@ class Window:
             print(Subject, FacultyID, Class)
             self.__Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
             self.__FaceObj = FaceRecog()
+            Button(self.__mainFrm, text="Take Attendace", font=self.__font, command=self.__AttenadanceWindow).pack(pady=10)
             
         ClassId = self.__FbObj.GetClass()
         n = StringVar()
