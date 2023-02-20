@@ -14,6 +14,9 @@ from tkinter import ttk
 
 print(str(datetime.datetime.fromtimestamp(time.time()))[:10])
 
+class Ardunio:
+    pass
+
 class Mail:
     def send(self, toMail:list, message) -> None:
         s = smtplib.SMTP('smtp.gmail.com', 587)
@@ -131,7 +134,9 @@ class Attendance:
         self.__FBobj.AppendValue("meta", "FacultyID", self.__FacultyID, hc)
         self.__FBobj.AppendValue("meta", "Subject", self.__Subject, hc)
         self.__FBobj.AddHash(hc)
-        self.__FBobj.CreateAttendance(hc, self.__FBobj.GetStudents(self.__Class))
+        stuList = self.__FBobj.GetStudents(self.__Class)
+        self.__FBobj.CreateAttendance(hc, stuList)
+        self.__FBobj.GetImages(stuList)
     def MarkPresent(self, student:str):
         self.__FBobj.UpdateAttendance(self.__Hash, student, 'P')
     def Record(self, x):
@@ -140,6 +145,7 @@ class Attendance:
 class FaceRecog:
 
     __TrainedList:list = None
+    __Rfid:Ardunio = None
     __ID = os.listdir("Images")
 
     FunAdd = lambda self, a : "Images\\"+a
@@ -147,6 +153,7 @@ class FaceRecog:
     def __init__(self) -> None:
         self.__TrainedList = self.Train(tuple(map(self.FunAdd, self.__ID)))
         self.__cam = cv2.VideoCapture(0)
+        self.__Rfid = Ardunio("COM3")
         print("Camera On..")
     
     def PlotFace(self, img):
@@ -178,7 +185,7 @@ class FaceRecog:
             return results
         except:
             return []
-    
+
     def initialize(self):
         check, frame = self.__cam.read()
         self.PlotFace(frame)
@@ -235,7 +242,9 @@ class Window:
     def __CreateAttendanceWindow(self):
         def Create(Subject, FacultyID, Class):
             print(Subject, FacultyID, Class)
-            #self.Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
+            self.__Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
+            self.__FaceObj = FaceRecog()
+            self.__FaceObj.initialize()
         ClassId = self.__FbObj.GetClass()
         n = StringVar()
         ttk.Combobox(self.__mainFrm, values=ClassId, textvariable=n, width=20, font=self.__font).pack(pady=10)
