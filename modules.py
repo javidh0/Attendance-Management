@@ -218,16 +218,14 @@ class Ardunio:
         
     def Disconnect(self):
         self.__Conn.close()
-    
+    def Refresh(self):
+        self.__Conn.read_all()
     def read(self) -> str:
-        self.__Conn.write(b"r")
-        time.sleep(0.2)
-        temp =  self.__Conn.read_all().decode('utf-8')
-        for x in range(5):
-            if(temp!=''):
-                return temp
-        
-        return None
+        while True:
+            time.sleep(0.5)
+            temp = self.__Conn.readline()
+            if temp != b'':
+                return temp.decode('utf-8')
     
 class Window:
     __root:Tk  = None
