@@ -158,9 +158,6 @@ class FaceRecog:
 
     def start(self):
         self.__TrainedList = self.Train(tuple(map(self.FunAdd, self.__ID)))
-        self.__cam = cv2.VideoCapture(0)
-        self.__Rfid = Ardunio("COM3")
-        print("Camera On..")
     
     def PlotFace(self, img):
         try:
@@ -173,6 +170,7 @@ class FaceRecog:
         for i in range(len(results)):
             if results[i]:
                 return [True, self.__ID[i]]
+        return [False, None]
 
     def Train(self, images:list[str]) -> list:                  
         encodedList = []  
@@ -192,8 +190,8 @@ class FaceRecog:
         except:
             return []
 
-    def initialize(self):
-        check, frame = self.__cam.read()
+    def initialize(self, cam):
+        check, frame = cam.read()
         self.PlotFace(frame)
         result = self.Test(frame, self.__TrainedList)
         got = self.evaluate(result)
@@ -234,7 +232,9 @@ class Window:
     __FbObj:FireBase = None
     __Attendance:Attendance = None
     __FbObj:FireBase = None
-    def __init__(self) -> None:
+    __cam:cv2 = None
+    __FaceObj:FaceRecog = None
+    def __init__(self, FaceRecog_:FaceRecog ) -> None:
         pyg
         self.__root = Tk()
         self.__root.title("<<Title>>")
@@ -245,8 +245,10 @@ class Window:
         self.__mainFrm.place(relx=0.5, rely=0.5, anchor=CENTER, relwidth=0.99, relheight=0.99)
         self.__FbObj = FireBase()
         self.__FbObj.initialize()
+        self.__FaceObj = FaceRecog_
 
     def __AttenadanceWindow(self):
+        self.__cam = cv2.VideoCapture(0)
         def Clr():
             for i in at_root.winfo_children():
                 i.destroy()
@@ -259,7 +261,8 @@ class Window:
         at_root.geometry('%dx%d'%(width, height))
         while True:
             at_root.update()
-            id = self.__FbObj.initialize()
+            id = self.__FaceObj.initialize(self.__cam)
+            print(id)
             at_root.update()
             if id != None:
                 Clr()
@@ -274,7 +277,6 @@ class Window:
     def Create(self, Subject, FacultyID, Class):
         print(Subject, FacultyID, Class)
         self.__Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
-        self.__FaceObj = FaceRecog()
         self.__FaceObj.start()
         Button(self.__mainFrm, text="Take Attendace", font=self.__font, command=self.__AttenadanceWindow).pack(pady=10)
         
