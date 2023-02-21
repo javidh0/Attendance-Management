@@ -84,8 +84,9 @@ class FireBase:
         if not (state == 'A' or state == 'P'):
             print("Error : Invalid Key :"+state)
             return
-        print(self.__dataBase.child("Attendance").child(hash).child(student).get().val())
+        temp = self.__dataBase.child("Attendance").child(hash).child(student).get().val()
         self.__dataBase.child("Attendance").child(hash).update({student:state})
+        return temp
 
     def Push(self, path1:str,path2:str, data:dict):
         self.__dataBase.child(path1).child(path2).set(data)
@@ -139,7 +140,8 @@ class Attendance:
         self.__FBobj.CreateAttendance(hc, stuList)
         self.__FBobj.GetImages(stuList)
     def MarkPresent(self, student:str):
-        self.__FBobj.UpdateAttendance(self.__Hash, student, 'P')
+        temp = self.__FBobj.UpdateAttendance(self.__Hash, student, 'P')
+        return temp == 'A'
     def Record(self, x):
         print(x)
     def GetTitle(self):
@@ -268,10 +270,14 @@ class Window:
                 Clr()
                 Label(at_root, text=id, font=self.__font).pack(pady=10, padx=10)
                 at_root.update()
-                self.__Attendance.MarkPresent(id)
-                at_root.update()
-                Label(at_root, text="Marked Present", font=self.__font).pack(padx=10, pady=10)
-                at_root.update()
+                if self.__Attendance.MarkPresent(id):
+                    at_root.update()
+                    Label(at_root, text="Marked Present", font=self.__font).pack(padx=10, pady=10)
+                    at_root.update()
+                else:
+                    at_root.update()
+                    Label(at_root, text="Already Marked Present", font=self.__font).pack(padx=10, pady=10)
+                    at_root.update()
             
         at_root.mainloop()
     def Create(self, Subject, FacultyID, Class):
