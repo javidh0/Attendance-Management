@@ -330,6 +330,7 @@ class Window:
     __cam:cv2 = None
     __FaceObj:FaceRecog = None
     videoLabel:Label = None
+    __Arduino:Ardunio = None
     def __init__(self, FaceRecog_:FaceRecog ) -> None:
         pyg
         self.__root = Tk()
@@ -342,6 +343,9 @@ class Window:
         self.__FbObj = FireBase()
         self.__FbObj.initialize()
         self.__FaceObj = FaceRecog_
+        self.__Arduino = Ardunio("COM5")
+        if not self.__Arduino.Connect():
+            print("Arduino not connected")
     def __CloseAttendance(self):
         df = self.__Attendance.GetRecords()
         lst = list(df[df['A/P'] == 'A']['ID'])
@@ -355,7 +359,37 @@ class Window:
         print("Mail sent")
         self.__cam.release()
         self.at_root.destroy()
-        
+    def __CloseAttendance1(self):
+        df = self.__Attendance.GetRecords()
+        lst = list(df[df['A/P'] == 'A']['ID'])
+        ml = Mail()
+        print("Mail sending to faculty")
+        ml.send_df(self.__MailId, "Attendance", "PFA", df, "Attendance.csv")
+        print("Mail sent")
+        mailIDS = self.__FbObj.GetMailID(lst)
+        print("Mail sending to students")
+        ml.send_mail_message(mailIDS[0], "You were marked Absent in "+self.__Attendance.GetTitle())
+        print("Mail sent")
+        self.__cam.release()
+        self.rfid_root.destroy()
+    
+    def __AttenadanceWindowRFID(self):
+        rfid_root = Tk()
+        self.rfid_root = rfid_root
+        rfid_root.title(self.__Attendance.GetTitle())
+        width = self.__root.winfo_screenwidth() - 500
+        height = self.__root.winfo_screenheight() - 50
+        rfid_root.geometry('%dx%d'%(width, height))
+        Button(rfid_root, text="Close Attendance", font=self.__font, command=self.__CloseAttendance1).pack(pady=10)
+
+        disFrame = Frame(rfid_root)
+        disFrame.pack(padx=10, pady=10)
+
+        while True:
+            rfid_root.update()
+            id = self.__Arduino.read()
+            
+
     def __AttenadanceWindow(self):
         self.__cam = cv2.VideoCapture(0)
         def Update(rt):
@@ -408,7 +442,7 @@ class Window:
                     Label(Dis, text="Already Marked Present", font=self.__font).pack(padx=10, pady=10)
                     if Update(at_root):
                         break
-            
+
         at_root.mainloop()
     def Create(self, Subject, FacultyID, Class, MailID):
         self.__MailId = MailID
