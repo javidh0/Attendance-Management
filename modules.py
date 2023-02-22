@@ -322,11 +322,16 @@ class Ardunio:
         temp = self.__Conn.readline()
         if temp != b'':
             return temp.decode('utf-8')
+    def isOpen(self):
+        if self.__Conn == None:
+            return False
+        return self.__Conn.isOpen()
 
 class Window:
     __root:Tk  = None
     __mainFrm:LabelFrame = None
     __font = ("Consolas", 17)
+    __title = ("Consolas", 20)
     __FbObj:FireBase = None
     __Attendance:Attendance = None
     __FbObj:FireBase = None
@@ -334,10 +339,11 @@ class Window:
     __FaceObj:FaceRecog = None
     videoLabel:Label = None
     __Arduino:Ardunio = None
+    lbl:Label = None
     def __init__(self, FaceRecog_:FaceRecog ) -> None:
         pyg
         self.__root = Tk()
-        self.__root.title("<<Title>>")
+        self.__root.title("SRM Attendance")
         width = self.__root.winfo_screenwidth() - 500   
         height = self.__root.winfo_screenheight() - 50
         self.__root.geometry('%dx%d'%(width, height))
@@ -347,9 +353,15 @@ class Window:
         self.__FbObj.initialize()
         self.__FaceObj = FaceRecog_
         self.__Arduino = Ardunio("COM5")
+        self.ConnectArduino()
+
+    def ConnectArduino(self):
         temp = self.__Arduino.Connect()
-        if not temp:
-            print("Arduino not connected")
+        return temp
+    
+    def CheckConnect(self):
+        return self.__Arduino.isOpen()
+
     def __CloseAttendance(self):
         self.at_root.destroy()
         df = self.__Attendance.GetRecords()
@@ -478,6 +490,30 @@ class Window:
     
     def MainWindow(self):
         Button(self.__mainFrm, text="Create Attendance", font=self.__font, command=self.__CreateAttendanceWindow).pack(pady=10)
+
+    def __RefreshMain(self):
+        for i in self.__mainFrm.winfo_children():
+            i.destroy()
+        self.MainWindow1()
+
+    def MainWindow1(self):
+        Label(self.__mainFrm, text="SRM-Automated Attendance", font=self.__title).place(relx=0.5, rely=0.05, anchor=CENTER)
+        self.btn = Button(self.__mainFrm, text="Arduino Reconnect", command=self.ConnectArduino, font=self.__font)
+        self.btn.place(relx=0.98, rely=0.14, anchor=E)
+        self.btn['state'] = DISABLED
+        Button(self.__mainFrm, text="Refresh", font=self.__font, command=self.__RefreshMain).place(relx=0.98, rely=0.21, anchor=E)
+        tm = str(datetime.datetime.fromtimestamp(time.time()))[:10]
+        Label(self.__mainFrm, text='Date:'+tm, font=self.__font).place(relx=0.02, rely=0.1, anchor=W)
+        Label(self.__mainFrm, text='Arduino Connection Status', font=self.__font)
+        
+        stat = self.CheckConnect()
+        if stat:
+            self.btn['state'] = DISABLED
+            Label(self.__mainFrm, text="Connected", font=self.__font, fg='green').place(relx=0.02, rely=0.175, anchor=W)
+        else:
+            self.btn['state'] = NORMAL
+            Label(self.__mainFrm, text="Not Connected", font=self.__font, fg='red').place(relx=0.02, rely=0.175, anchor=W)
+
 
     def enable(self):
         self.__root.mainloop()
