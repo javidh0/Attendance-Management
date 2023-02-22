@@ -362,7 +362,7 @@ class Window:
         Dis.pack()
         while True:
             at_root.update()
-            id = self.__FaceObj.initialize(self.__cam)
+            id = self.__FaceObj.Test(self.__cam.read()[1])
             if False:
                 check, frame = self.__cam.read()
                 b,g,r = cv2.split(frame)
@@ -373,7 +373,7 @@ class Window:
                 Label(at_root, image=imgtk).pack()
                 at_root.update()
                 self.__cam.release()
-            if id != None:
+            if id != None or id != 'UN':
                 Clr(Dis)
                 print(id)
 
