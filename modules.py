@@ -322,7 +322,7 @@ class Ardunio:
         temp = self.__Conn.readline()
         if temp != b'':
             return temp.decode('utf-8')
-    
+
 class Window:
     __root:Tk  = None
     __mainFrm:LabelFrame = None
@@ -377,7 +377,6 @@ class Window:
         print("Mail sent")
         self.__cam.release()
         
-    
     def __AttenadanceWindowRFID(self):
         rfid_root = Tk()
         self.rfid_root = rfid_root
