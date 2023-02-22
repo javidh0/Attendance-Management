@@ -177,10 +177,8 @@ class FireBase:
         return tr
     
     def Rfid_to_RA(self, rfid:str):
-        try:
-            return self.__dataBase.child("Rfid").child(rfid).get().val()
-        except:
-            return None
+        return self.__dataBase.child("Rfid").child(rfid).get().val()
+    
         
 class Attendance:
     __FBobj:FireBase = None
@@ -348,8 +346,9 @@ class Window:
         self.__FbObj = FireBase()
         self.__FbObj.initialize()
         self.__FaceObj = FaceRecog_
-        self.__Arduino = Ardunio("COM4")
-        if not self.__Arduino.Connect():
+        self.__Arduino = Ardunio("COM5")
+        temp = self.__Arduino.Connect()
+        if not temp:
             print("Arduino not connected")
     def __CloseAttendance(self):
         df = self.__Attendance.GetRecords()
@@ -394,10 +393,10 @@ class Window:
             rfid_root.update()
             id = self.__Arduino.read()
             if id != None:
-                print(id)
-                RA = self.__FbObj.Rfid_to_RA(id)
-                print(RA)
-                self.__Attendance.MarkPresent(RA)
+                print(id[:-2])
+                ra = self.__FbObj.Rfid_to_RA(id[:-2])
+                print(ra)
+                self.__Attendance.MarkPresent(ra)
 
 
     def __AttenadanceWindow(self):
