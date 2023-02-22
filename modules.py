@@ -473,7 +473,8 @@ class Window:
         Button(self.__mainFrm, text="Take Rfid Attendance", font=self.__font, command=self.__AttenadanceWindowRFID).pack(pady=10)
         
     def __CreateAttendanceWindow(self):
-
+        for i in self.__mainFrm.winfo_children():
+            i.destroy()
         ClassId = self.__FbObj.GetClass()
         n = StringVar()
         ttk.Combobox(self.__mainFrm, values=ClassId, textvariable=n, width=20, font=self.__font).pack(pady=10)
@@ -505,14 +506,20 @@ class Window:
         tm = str(datetime.datetime.fromtimestamp(time.time()))[:10]
         Label(self.__mainFrm, text='Date:'+tm, font=self.__font).place(relx=0.02, rely=0.1, anchor=W)
         Label(self.__mainFrm, text='Arduino Connection Status', font=self.__font)
-        
+        self.btn2 = Button(self.__mainFrm, text="Create Attendance", font=self.__font, command=self.__CreateAttendanceWindow)
+        self.btn2.place(relx=0.5, rely=0.25, anchor=CENTER)
+        self.btn2['state'] = DISABLED
+
         stat = self.CheckConnect()
         if stat:
             self.btn['state'] = DISABLED
+            self.btn2['state'] = NORMAL
             Label(self.__mainFrm, text="Connected", font=self.__font, fg='green').place(relx=0.02, rely=0.175, anchor=W)
         else:
             self.btn['state'] = NORMAL
+            self.btn2['state'] = DISABLED
             Label(self.__mainFrm, text="Not Connected", font=self.__font, fg='red').place(relx=0.02, rely=0.175, anchor=W)
+        
 
 
     def enable(self):
