@@ -281,6 +281,8 @@ class FaceRecog1:
             if True in matches:
                 match_index = matches.index(True)
                 name = self.__ID[match_index]
+            if name == 'UN':
+                return None
             return name
 
 class Ardunio:
@@ -373,7 +375,7 @@ class Window:
                 Label(at_root, image=imgtk).pack()
                 at_root.update()
                 self.__cam.release()
-            if id != None or id != 'UN':
+            if id != None:
                 Clr(Dis)
                 print(id)
 
