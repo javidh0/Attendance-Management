@@ -4,13 +4,18 @@ import face_recognition
 import time
 import cv2
 import random
-import smtplib
 import datetime
 import os
 import serial as se
 from tkinter import *
 import pyautogui as pyg
 from tkinter import ttk
+import smtplib,ssl
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+from email.utils import formatdate
+from email import encoders
 
 print(str(datetime.datetime.fromtimestamp(time.time()))[:10])
 
@@ -18,12 +23,29 @@ class Ardunio:
     pass
 
 class Mail:
-    def send(self, toMail:list, message) -> None:
-        s = smtplib.SMTP('smtp.gmail.com', 587)
-        s.starttls()
-        s.login("javidh123456789@gmail.com", "yhssozhjtvkvwdxw")
-        s.sendmail("javidh123456789@gmail.com", toMail, message)
-        s.quit()
+    __send_mail = "tt275987@gmail.com"
+    __username = "tt275987@gmail.com"
+    __password = 'tazzpfbrhlczccva'
+    
+    def send_mail(self, send_to,subject,text,files, file_name):
+        msg = MIMEMultipart()
+        msg['From'] = self.__send_from
+        msg['To'] = send_to
+        msg['Date'] = formatdate(localtime = True)
+        msg['Subject'] = subject
+        msg.attach(MIMEText(text))
+
+        part = MIMEBase('application', "octet-stream")
+        part.set_payload(open(files, "rb").read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment; filename='+file_name)
+        msg.attach(part)
+
+        smtp = smtplib.SMTP('smtp.gmail.com', 587)
+        smtp.starttls()
+        smtp.login(self.__username,self.__password)
+        smtp.sendmail(self.__send_from, send_to, msg.as_string())
+        smtp.quit()
 
 class Hash:
     __aph = string.ascii_lowercase
@@ -287,7 +309,7 @@ class Window:
         Button(self.__mainFrm, text="Take Attendace", font=self.__font, command=self.__AttenadanceWindow).pack(pady=10)
         
     def __CreateAttendanceWindow(self):
-            
+
         ClassId = self.__FbObj.GetClass()
         n = StringVar()
         ttk.Combobox(self.__mainFrm, values=ClassId, textvariable=n, width=20, font=self.__font).pack(pady=10)
