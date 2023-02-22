@@ -16,6 +16,7 @@ from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.utils import formatdate
 from email import encoders
+from PIL import Image, ImageTk
 
 print(str(datetime.datetime.fromtimestamp(time.time()))[:10])
 
@@ -177,7 +178,6 @@ class Attendance:
         return str(self.__Class) +" "+ str(self.__Subject)
 
 class FaceRecog:
-
     __TrainedList:list = None
     __Rfid:Ardunio = None
     __ID = os.listdir("Images")
@@ -290,7 +290,13 @@ class Window:
         width = self.__root.winfo_screenwidth() - 500   
         height = self.__root.winfo_screenheight() - 50
         at_root.geometry('%dx%d'%(width, height))
+        videoLabel = Label(at_root)
+        videoLabel.pack(padx=10, pady=10)
         while True:
+            videoImage = Image.fromarray(cv2.cvtColor(self.__cam.read()[1], cv2.COLOR_BGR2RGB))
+            forTk = ImageTk.PhotoImage(image=videoImage)
+            videoLabel.imgtk = forTk
+            videoLabel.configure(image=forTk)
             at_root.update()
             id = self.__FaceObj.initialize(self.__cam)
             print(id)
@@ -309,7 +315,8 @@ class Window:
                     at_root.update()
             
         at_root.mainloop()
-    def Create(self, Subject, FacultyID, Class):
+    def Create(self, Subject, FacultyID, Class, MailID):
+        self.__MailId = MailID
         print(Subject, FacultyID, Class)
         self.__Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
         self.__FaceObj.start()
@@ -326,7 +333,9 @@ class Window:
         FacultyId = ttk.Entry(self.__mainFrm, width=20, font=self.__font)
         FacultyId.pack(pady=10)
         FacultyId.insert(0, 'Faculty Id')
-        Button(self.__mainFrm, text="--OK--", font=self.__font, command=lambda: self.Create(Subject_Code.get(), FacultyId.get(), n.get())).pack(pady=10)
+        MailId = ttk.Entry(self.__mainFrm, width=20, font=self.__font)
+        MailId.insert(0, 'Faculty Mail')
+        Button(self.__mainFrm, text="--OK--", font=self.__font, command=lambda: self.Create(Subject_Code.get(), FacultyId.get(), n.get(), MailId.get())).pack(pady=10)
     
     def MainWindow(self):
         Button(self.__mainFrm, text="Create Attendance", font=self.__font, command=self.__CreateAttendanceWindow).pack(pady=10)
