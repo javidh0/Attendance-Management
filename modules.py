@@ -6,6 +6,7 @@ import cv2
 import random
 import datetime
 import os
+import pandas as pd
 import serial as se
 from tkinter import *
 import pyautogui as pyg
@@ -147,6 +148,9 @@ class FireBase:
     def GetClass(self):
         temp:dict = self.__dataBase.child("Class").get().val()
         return tuple(temp.keys())
+    
+    def GetRecords(self, hash:str):
+        return pd.DataFrame(self.__dataBase.child("Attendance").child(hash).get().val())
 
 class Attendance:
     __FBobj:FireBase = None
@@ -176,6 +180,8 @@ class Attendance:
         print(x)
     def GetTitle(self):
         return str(self.__Class) +" "+ str(self.__Subject)
+    def GetRecords(self):
+        return self.__FBobj.GetRecords(self.__Hash)
 
 class FaceRecog:
     __TrainedList:list = None
@@ -278,7 +284,9 @@ class Window:
         self.__FbObj = FireBase()
         self.__FbObj.initialize()
         self.__FaceObj = FaceRecog_
-
+    def __CloseAttendance(self):
+        df = self.__Attendance.GetRecords()
+        print(df)
     def __AttenadanceWindow(self):
         self.__cam = cv2.VideoCapture(0)
         def Clr():
@@ -288,9 +296,10 @@ class Window:
         at_root.title()
         tit = self.__Attendance.GetTitle()
         at_root.title(tit)
-        width = self.__root.winfo_screenwidth() - 500   
-        height = self.__root.winfo_screenheight() - 50
+        width = self.__root.winfo_screenwidth() - 50   
+        height = self.__root.winfo_screenheight() - 500
         at_root.geometry('%dx%d'%(width, height))
+        Button(at_root, text="Close Attendance", font=self.__font).pack(pady=10)
         while True:
             at_root.update()
             id = self.__FaceObj.initialize(self.__cam)
@@ -306,6 +315,7 @@ class Window:
                 self.__cam.release()
             if id != None:
                 Clr()
+                Button(at_root, text="Close Attendance", font=self.__font).pack(pady=10)
                 print(id)
                 Label(at_root, text=id, font=self.__font).pack(pady=10, padx=10)
                 at_root.update()
@@ -324,7 +334,7 @@ class Window:
         print(Subject, FacultyID, Class)
         self.__Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
         self.__FaceObj.start()
-        Button(self.__mainFrm, text="Take Attendace", font=self.__font, command=self.__AttenadanceWindow).pack(pady=10)
+        Button(self.__mainFrm, text="Take Attendance", font=self.__font, command=self.__AttenadanceWindow).pack(pady=10)
         
     def __CreateAttendanceWindow(self):
 
