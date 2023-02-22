@@ -285,6 +285,7 @@ class Window:
         self.__FbObj.initialize()
         self.__FaceObj = FaceRecog_
     def __CloseAttendance(self):
+        self.at_root.destroy()
         df = self.__Attendance.GetRecords()
         print(df)
     def __AttenadanceWindow(self):
@@ -294,12 +295,13 @@ class Window:
                 i.destroy()
         at_root = Tk()
         at_root.title()
+        self.at_root = at_root
         tit = self.__Attendance.GetTitle()
         at_root.title(tit)
         width = self.__root.winfo_screenwidth() - 50   
         height = self.__root.winfo_screenheight() - 500
         at_root.geometry('%dx%d'%(width, height))
-        Button(at_root, text="Close Attendance", font=self.__font).pack(pady=10)
+        Button(at_root, text="Close Attendance", font=self.__font, command=self.__CloseAttendance).pack(pady=10)
         while True:
             at_root.update()
             id = self.__FaceObj.initialize(self.__cam)
