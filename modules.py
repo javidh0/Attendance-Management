@@ -399,7 +399,6 @@ class Window:
                 print(ra)
                 self.__Attendance.MarkPresent(ra)
 
-
     def __AttenadanceWindow(self):
         self.__cam = cv2.VideoCapture(0)
         def Update(rt):
