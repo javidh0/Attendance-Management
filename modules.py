@@ -175,6 +175,12 @@ class FireBase:
             tr[0].append(temp['MailID'])
             tr[1].append(temp['Name'])
         return tr
+    
+    def Rfid_to_RA(self, rfid:str):
+        try:
+            return self.__dataBase.child("Rfid").child(rfid).get().val()
+        except:
+            return None
         
 class Attendance:
     __FBobj:FireBase = None
@@ -314,11 +320,10 @@ class Ardunio:
     def Refresh(self):
         self.__Conn.read_all()
     def read(self) -> str:
-        while True:
-            time.sleep(0.5)
-            temp = self.__Conn.readline()
-            if temp != b'':
-                return temp.decode('utf-8')
+        time.sleep(0.5)
+        temp = self.__Conn.readline()
+        if temp != b'':
+            return temp.decode('utf-8')
     
 class Window:
     __root:Tk  = None
@@ -343,7 +348,7 @@ class Window:
         self.__FbObj = FireBase()
         self.__FbObj.initialize()
         self.__FaceObj = FaceRecog_
-        self.__Arduino = Ardunio("COM5")
+        self.__Arduino = Ardunio("COM4")
         if not self.__Arduino.Connect():
             print("Arduino not connected")
     def __CloseAttendance(self):
@@ -388,7 +393,12 @@ class Window:
         while True:
             rfid_root.update()
             id = self.__Arduino.read()
-            
+            if id != None:
+                print(id)
+                RA = self.__FbObj.Rfid_to_RA(id)
+                print(RA)
+                self.__Attendance.MarkPresent(RA)
+
 
     def __AttenadanceWindow(self):
         self.__cam = cv2.VideoCapture(0)
@@ -449,7 +459,8 @@ class Window:
         print(Subject, FacultyID, Class)
         self.__Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
         self.__FaceObj.start()
-        Button(self.__mainFrm, text="Take Attendance", font=self.__font, command=self.__AttenadanceWindow).pack(pady=10)
+        Button(self.__mainFrm, text="Take FaceRecognition Attendance", font=self.__font, command=self.__AttenadanceWindow).pack(pady=10)
+        Button(self.__mainFrm, text="Take Rfid Attendance", font=self.__font, command=self.__AttenadanceWindowRFID).pack(pady=10)
         
     def __CreateAttendanceWindow(self):
 
