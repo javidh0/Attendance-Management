@@ -20,6 +20,28 @@ enc2 = face_recognition.face_encodings(img2)[0]
 known_faces.append(enc2)
 known_names.append("Ansh Tandon")
 
+
+img3 = face_recognition.load_image_file("data\RA2111026010177.jpeg")
+enc1 = face_recognition.face_encodings(img3)[0]
+known_faces.append(enc1)
+known_names.append("Vishal Sridhar")
+
+img4 = face_recognition.load_image_file("data\RA2111026010186.jpeg")
+enc1 = face_recognition.face_encodings(img4)[0]
+known_faces.append(enc1)
+known_names.append("Raghunath Rao")
+
+img5 = face_recognition.load_image_file("data\RA2111026010197.jpeg")
+enc1 = face_recognition.face_encodings(img5)[0]
+known_faces.append(enc1)
+known_names.append("Bhavishya Pattanayak")
+
+
+img6 = face_recognition.load_image_file("data\RA2111026010202.jpeg")
+enc2 = face_recognition.face_encodings(img6)[0]
+known_faces.append(enc2)
+known_names.append("Sai Manoj Yarlagadda")
+
 # Initialize the webcam
 cap = cv2.VideoCapture(0)
 
@@ -35,20 +57,21 @@ while True:
     for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
         # See if the face is a match for the known faces
         matches = face_recognition.compare_faces(known_faces, face_encoding)
+    
 
         # If there is a match, use the name of that person
         name = "Unknown"
         if True in matches:
             match_index = matches.index(True)
             name = known_names[match_index]
-
+        print(name)
         # Draw a box around the face
-        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+        '''cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
         # Draw a label with a name below the face
         cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
         font = cv2.FONT_HERSHEY_DUPLEX
-        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)'''
 
     # Display the resulting image
     cv2.imshow('Video', frame)
