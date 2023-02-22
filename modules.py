@@ -302,9 +302,11 @@ class Window:
         self.__FaceObj = FaceRecog_
     def __CloseAttendance(self):
         df = self.__Attendance.GetRecords()
+        lst = list(df[df['A/P'] == 'A']['ID'])
+        print(lst)
         ml = Mail()
         ml.send_df(self.__MailId, "Attendance", "PFA", df, "Attendance.csv")
-
+        self.__cam.release()
         self.at_root.destroy()
         
     def __AttenadanceWindow(self):
