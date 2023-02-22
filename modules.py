@@ -253,6 +253,36 @@ class FaceRecog:
             return got[1]
         return None
 
+class FaceRecog1:
+    __TrainedList:list = None
+    __Rfid:Ardunio = None
+    __ID = os.listdir("Images")
+
+    FunAdd = lambda self, a : "Images\\"+a
+
+    def start(self):
+        self.__TrainedList = self.Train(tuple(map(self.FunAdd, self.__ID)))
+
+    def Train(self, images:list[str]):
+        tr = []
+        for loc in images:
+            img = face_recognition.load_image_file(loc)
+            enc = face_recognition.face_encodings(img)[0]
+            tr.append(enc)
+        return tr
+    
+    def Test(self, frame):
+        face_locations = face_recognition.face_locations(frame)
+        face_encodings = face_recognition.face_encodings(frame, face_locations)
+        for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
+            matches = face_recognition.compare_faces(self.__TrainedList, face_encoding)
+    
+            name = "UN"
+            if True in matches:
+                match_index = matches.index(True)
+                name = self.__ID[match_index]
+            return name
+
 class Ardunio:
     __Port:str = None
     __Conn:se.Serial = None 
@@ -292,8 +322,8 @@ class Window:
         pyg
         self.__root = Tk()
         self.__root.title("<<Title>>")
-        width = self.__root.winfo_screenwidth() - 50   
-        height = self.__root.winfo_screenheight() - 500
+        width = self.__root.winfo_screenwidth() - 500   
+        height = self.__root.winfo_screenheight() - 50
         self.__root.geometry('%dx%d'%(width, height))
         self.__mainFrm = LabelFrame(self.__root)
         self.__mainFrm.place(relx=0.5, rely=0.5, anchor=CENTER, relwidth=0.99, relheight=0.99)
@@ -324,8 +354,8 @@ class Window:
         self.at_root = at_root
         tit = self.__Attendance.GetTitle()
         at_root.title(tit)
-        width = self.__root.winfo_screenwidth() - 50   
-        height = self.__root.winfo_screenheight() - 500
+        width = self.__root.winfo_screenwidth() - 500
+        height = self.__root.winfo_screenheight() - 50
         at_root.geometry('%dx%d'%(width, height))
         Button(at_root, text="Close Attendance", font=self.__font, command=self.__CloseAttendance).pack(pady=10)
         Dis = Frame(at_root)
