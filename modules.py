@@ -351,19 +351,7 @@ class Window:
         if not temp:
             print("Arduino not connected")
     def __CloseAttendance(self):
-        df = self.__Attendance.GetRecords()
-        lst = list(df[df['A/P'] == 'A']['ID'])
-        ml = Mail()
-        print("Mail sending to faculty")
-        ml.send_df(self.__MailId, "Attendance", "PFA", df, "Attendance.csv")
-        print("Mail sent")
-        mailIDS = self.__FbObj.GetMailID(lst)
-        print("Mail sending to students")
-        ml.send_mail_message(mailIDS[0], "You were marked Absent in "+self.__Attendance.GetTitle())
-        print("Mail sent")
-        self.__cam.release()
         self.at_root.destroy()
-    def __CloseAttendance1(self):
         df = self.__Attendance.GetRecords()
         lst = list(df[df['A/P'] == 'A']['ID'])
         ml = Mail()
@@ -375,7 +363,20 @@ class Window:
         ml.send_mail_message(mailIDS[0], "You were marked Absent in "+self.__Attendance.GetTitle())
         print("Mail sent")
         self.__cam.release()
+    def __CloseAttendance1(self):
         self.rfid_root.destroy()
+        df = self.__Attendance.GetRecords()
+        lst = list(df[df['A/P'] == 'A']['ID'])
+        ml = Mail()
+        print("Mail sending to faculty")
+        ml.send_df(self.__MailId, "Attendance", "PFA", df, "Attendance.csv")
+        print("Mail sent")
+        mailIDS = self.__FbObj.GetMailID(lst)
+        print("Mail sending to students")
+        ml.send_mail_message(mailIDS[0], "You were marked Absent in "+self.__Attendance.GetTitle())
+        print("Mail sent")
+        self.__cam.release()
+        
     
     def __AttenadanceWindowRFID(self):
         rfid_root = Tk()
