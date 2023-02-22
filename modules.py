@@ -26,8 +26,15 @@ class Mail:
     __send_mail = "tt275987@gmail.com"
     __username = "tt275987@gmail.com"
     __password = 'tazzpfbrhlczccva'
-    
-    def send_mail(self, send_to,subject,text,files, file_name):
+
+    def send_mail_message(self, toMail:list, message) -> None:
+        s = smtplib.SMTP('smtp.gmail.com', 587)
+        s.starttls()
+        s.login("javidh123456789@gmail.com", "yhssozhjtvkvwdxw")
+        s.sendmail("javidh123456789@gmail.com", toMail, message)
+        s.quit()
+
+    def send_mail_file(self, send_to,subject,text,files, file_name):
         msg = MIMEMultipart()
         msg['From'] = self.__send_from
         msg['To'] = send_to
