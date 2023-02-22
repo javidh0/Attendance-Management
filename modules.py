@@ -265,6 +265,7 @@ class Window:
     __FbObj:FireBase = None
     __cam:cv2 = None
     __FaceObj:FaceRecog = None
+    videoLabel:Label = None
     def __init__(self, FaceRecog_:FaceRecog ) -> None:
         pyg
         self.__root = Tk()
@@ -290,19 +291,22 @@ class Window:
         width = self.__root.winfo_screenwidth() - 500   
         height = self.__root.winfo_screenheight() - 50
         at_root.geometry('%dx%d'%(width, height))
-        videoLabel = Label(at_root)
-        videoLabel.pack(padx=10, pady=10)
         while True:
-            videoImage = Image.fromarray(cv2.cvtColor(self.__cam.read()[1], cv2.COLOR_BGR2RGB))
-            forTk = ImageTk.PhotoImage(image=videoImage)
-            videoLabel.imgtk = forTk
-            videoLabel.configure(image=forTk)
             at_root.update()
             id = self.__FaceObj.initialize(self.__cam)
-            print(id)
-            at_root.update()
+            if False:
+                check, frame = self.__cam.read()
+                b,g,r = cv2.split(frame)
+                img = cv2.merge((r,g,b))
+                im = Image.fromarray(img)
+                imgtk = ImageTk.PhotoImage(image=im)
+                Clr()
+                Label(at_root, image=imgtk).pack()
+                at_root.update()
+                self.__cam.release()
             if id != None:
                 Clr()
+                print(id)
                 Label(at_root, text=id, font=self.__font).pack(pady=10, padx=10)
                 at_root.update()
                 if self.__Attendance.MarkPresent(id):
@@ -334,7 +338,8 @@ class Window:
         FacultyId.pack(pady=10)
         FacultyId.insert(0, 'Faculty Id')
         MailId = ttk.Entry(self.__mainFrm, width=20, font=self.__font)
-        MailId.insert(0, 'Faculty Mail')
+        MailId.insert(0, 'mm1632@srmist.edu.in')
+        MailId.pack(pady=10)
         Button(self.__mainFrm, text="--OK--", font=self.__font, command=lambda: self.Create(Subject_Code.get(), FacultyId.get(), n.get(), MailId.get())).pack(pady=10)
     
     def MainWindow(self):
