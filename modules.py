@@ -176,19 +176,20 @@ class FireBase:
             tr[1].append(temp['Name'])
         return tr
         
-
 class Attendance:
     __FBobj:FireBase = None
     __Subject:str = None
     __Class:str = None
     __FacultyID:str = None
     __Hash:str = None
+    __date:str = None
     def __init__(self, obj:FireBase, Subject:str, FacultyID:str, Class:str) -> None:
         self.__FBobj = obj
         self.__Class = Class
         self.__Subject = Subject
         self.__FacultyID = FacultyID
         date = str(datetime.datetime.fromtimestamp(time.time()))[:10]
+        self.__date = date
         hc = Hash().GenerateCode(self.__FBobj)
         self.__Hash = hc
         self.__FBobj.AppendValue("meta", "Date", date, hc)
@@ -204,7 +205,7 @@ class Attendance:
     def Record(self, x):
         print(x)
     def GetTitle(self):
-        return str(self.__Class) +" "+ str(self.__Subject)
+        return str(self.__Class) +" "+ str(self.__Subject) +" "+ str(self.__date)
     def GetRecords(self):
         return self.__FBobj.GetRecords(self.__Hash)
 
@@ -344,11 +345,14 @@ class Window:
     def __CloseAttendance(self):
         df = self.__Attendance.GetRecords()
         lst = list(df[df['A/P'] == 'A']['ID'])
-        print(lst)
         ml = Mail()
+        print("Mail sending to faculty")
         ml.send_df(self.__MailId, "Attendance", "PFA", df, "Attendance.csv")
+        print("Mail sent")
         mailIDS = self.__FbObj.GetMailID(lst)
-        ml.send_mail_message(mailIDS[0], "You were marked Absent in ")
+        print("Mail sending to students")
+        ml.send_mail_message(mailIDS[0], "You were marked Absent in "+self.__Attendance.GetTitle())
+        print("Mail sent")
         self.__cam.release()
         self.at_root.destroy()
         
