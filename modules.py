@@ -150,7 +150,8 @@ class FireBase:
         return tuple(temp.keys())
     
     def GetRecords(self, hash:str):
-        return pd.DataFrame(self.__dataBase.child("Attendance").child(hash).get().val())
+        temp = list(self.__dataBase.child("Attendance").child(hash).get().val())
+        df = {"att"}
 
 class Attendance:
     __FBobj:FireBase = None
@@ -290,8 +291,8 @@ class Window:
         print(df)
     def __AttenadanceWindow(self):
         self.__cam = cv2.VideoCapture(0)
-        def Clr():
-            for i in at_root.winfo_children():
+        def Clr(frame):
+            for i in frame.winfo_children():
                 i.destroy()
         at_root = Tk()
         at_root.title()
@@ -302,6 +303,8 @@ class Window:
         height = self.__root.winfo_screenheight() - 500
         at_root.geometry('%dx%d'%(width, height))
         Button(at_root, text="Close Attendance", font=self.__font, command=self.__CloseAttendance).pack(pady=10)
+        Dis = Frame(at_root)
+        Dis.pack()
         while True:
             at_root.update()
             id = self.__FaceObj.initialize(self.__cam)
@@ -316,18 +319,18 @@ class Window:
                 at_root.update()
                 self.__cam.release()
             if id != None:
-                Clr()
-                Button(at_root, text="Close Attendance", font=self.__font).pack(pady=10)
+                Clr(Dis)
+                
                 print(id)
-                Label(at_root, text=id, font=self.__font).pack(pady=10, padx=10)
+
                 at_root.update()
                 if self.__Attendance.MarkPresent(id):
                     at_root.update()
-                    Label(at_root, text="Marked Present", font=self.__font).pack(padx=10, pady=10)
+                    Label(Dis, text="Marked Present", font=self.__font).pack(padx=10, pady=10)
                     at_root.update()
                 else:
                     at_root.update()
-                    Label(at_root, text="Already Marked Present", font=self.__font).pack(padx=10, pady=10)
+                    Label(Dis, text="Already Marked Present", font=self.__font).pack(padx=10, pady=10)
                     at_root.update()
             
         at_root.mainloop()
