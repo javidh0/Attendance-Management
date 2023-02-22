@@ -18,6 +18,7 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 from email import encoders
 from PIL import Image, ImageTk
+import json
 
 print(str(datetime.datetime.fromtimestamp(time.time()))[:10])
 
@@ -25,9 +26,16 @@ class Ardunio:
     pass
 
 class Mail:
-    __send_mail = "tt275987@gmail.com"
-    __username = "tt275987@gmail.com"
-    __password = 'tazzpfbrhlczccva'
+    __send_from = None
+    __username = None
+    __password = None
+
+    def __init__(self) -> None:
+        f = open('data\mail.json')
+        a = json.load(f)
+        self.__send_from = a['Cred']['MailID']
+        self.__username = a['Cred']['MailID']
+        self.__password = a['Cred']['pass']
 
     def send_mail_message(self, toMail:list, message) -> None:
         s = smtplib.SMTP('smtp.gmail.com', 587)
@@ -36,7 +44,7 @@ class Mail:
         s.sendmail("javidh123456789@gmail.com", toMail, message)
         s.quit()
 
-    def send_mail_file(self, send_to,subject,text,files, file_name):
+    def send_mail_file(self, send_to,subject,text, files, file_name):
         msg = MIMEMultipart()
         msg['From'] = self.__send_from
         msg['To'] = send_to
@@ -55,6 +63,10 @@ class Mail:
         smtp.login(self.__username,self.__password)
         smtp.sendmail(self.__send_from, send_to, msg.as_string())
         smtp.quit()
+    
+    def send_df(self, send_to, subject, text, df:pd.DataFrame, file_name):
+        df.to_csv("buffer.csv", index=None)
+        self.send_mail_file(send_to, subject, text, 'buffer.csv', file_name)
 
 class Hash:
     __aph = string.ascii_lowercase
@@ -150,8 +162,11 @@ class FireBase:
         return tuple(temp.keys())
     
     def GetRecords(self, hash:str):
-        temp = list(self.__dataBase.child("Attendance").child(hash).get().val())
-        df = {"att"}
+        temp = self.__dataBase.child("Attendance").child(hash).get().val()
+        lst = []
+        for i in temp.items():
+            lst.append(i)
+        return pd.DataFrame(lst, columns=['ID', 'A/P'])
 
 class Attendance:
     __FBobj:FireBase = None
@@ -286,11 +301,19 @@ class Window:
         self.__FbObj.initialize()
         self.__FaceObj = FaceRecog_
     def __CloseAttendance(self):
-        self.at_root.destroy()
         df = self.__Attendance.GetRecords()
-        print(df)
+        ml = Mail()
+        ml.send_df(self.__MailId, "Attendance", "PFA", df, "Attendance.csv")
+
+        self.at_root.destroy()
+        
     def __AttenadanceWindow(self):
         self.__cam = cv2.VideoCapture(0)
+        def Update(rt):
+            try:
+                rt.update()
+            except:
+                pass
         def Clr(frame):
             for i in frame.winfo_children():
                 i.destroy()
@@ -320,18 +343,22 @@ class Window:
                 self.__cam.release()
             if id != None:
                 Clr(Dis)
-                
                 print(id)
 
-                at_root.update()
+                if Update(at_root):
+                    break
                 if self.__Attendance.MarkPresent(id):
-                    at_root.update()
+                    if Update(at_root):
+                        break
                     Label(Dis, text="Marked Present", font=self.__font).pack(padx=10, pady=10)
-                    at_root.update()
+                    if Update(at_root):
+                        break
                 else:
-                    at_root.update()
+                    if Update(at_root):
+                        break
                     Label(Dis, text="Already Marked Present", font=self.__font).pack(padx=10, pady=10)
-                    at_root.update()
+                    if Update(at_root):
+                        break
             
         at_root.mainloop()
     def Create(self, Subject, FacultyID, Class, MailID):
