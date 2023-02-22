@@ -40,8 +40,8 @@ class Mail:
     def send_mail_message(self, toMail:list, message) -> None:
         s = smtplib.SMTP('smtp.gmail.com', 587)
         s.starttls()
-        s.login("javidh123456789@gmail.com", "yhssozhjtvkvwdxw")
-        s.sendmail("javidh123456789@gmail.com", toMail, message)
+        s.login(self.__send_from, self.__password)
+        s.sendmail(self.__username, toMail, message)
         s.quit()
 
     def send_mail_file(self, send_to,subject,text, files, file_name):
@@ -167,6 +167,15 @@ class FireBase:
         for i in temp.items():
             lst.append(i)
         return pd.DataFrame(lst, columns=['ID', 'A/P'])
+    
+    def GetMailID(self, students:list[str]):
+        tr = [[], []]
+        for ids in students:
+            temp = self.__dataBase.child('Students').child(ids).get().val()
+            tr[0].append(temp['MailID'])
+            tr[1].append(temp['Name'])
+        return tr
+        
 
 class Attendance:
     __FBobj:FireBase = None
@@ -338,6 +347,8 @@ class Window:
         print(lst)
         ml = Mail()
         ml.send_df(self.__MailId, "Attendance", "PFA", df, "Attendance.csv")
+        mailIDS = self.__FbObj.GetMailID(lst)
+        ml.send_mail_message(mailIDS[0], "You were marked Absent in ")
         self.__cam.release()
         self.at_root.destroy()
         
