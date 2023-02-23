@@ -145,7 +145,6 @@ class FireBase:
         print(lst)
         self.__dataBase.child(path1).child(path2).child(path3).set(lst)
 
-    
     def CreateAttendance(self, hash:str, students:tuple):    
         dct = {
         }
@@ -209,7 +208,16 @@ class FireBase:
     def Rfid_to_RA(self, rfid:str):
         return self.__dataBase.child("Rfid").child(rfid).get().val()
     
-        
+    def GetDatesData(self):
+        temp = self.__dataBase.child("meta").child("Date").get().val()
+        return temp
+    def GetFacultyData(self):
+        temp = self.__dataBase.child("meta").child("FacultyID").get().val()
+        return temp
+    def GetSubjectData(self):
+        temp = self.__dataBase.child("meta").child("Subject").get().val()
+        return temp
+
 class Attendance:
     __FBobj:FireBase = None
     __Subject:str = None
