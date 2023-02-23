@@ -1,5 +1,61 @@
 from modules import *
 
+class Table:
+
+    def TableDis(self, dt:pd.DataFrame, column_name, max_ht, rt, app:bool, wid):
+        w = ttk.Scrollbar(rt)
+        w.pack(side=RIGHT, fill = 'y')
+        tr = ttk.Treeview(rt, yscrollcommand=w.set)
+        tr['columns'] = column_name
+        tr.column('#0', minwidth=0, width=0)
+        for x in range(len(column_name)):
+            id = '#'+str(x+1)
+            tr.column(id, anchor=W, width=wid)
+        for x in column_name:
+            tr.heading(x, text = x, anchor=W)
+        tr['height'] = max_ht
+        if app:
+            for x in range(dt.shape[0]):
+                while(True):
+                    try:
+                        res = ''.join(random.choices(string.ascii_uppercase +string.digits, k = 10))
+                        tr.insert(parent='',index='end', iid=str(res), values=tuple(dt.iloc[x]), text='')
+                        break
+                    except:
+                        pass
+        tr.pack()
+        w.config(command=tr.yview)
+        return tr
+    
+    def TableAppend(self, dt, tr, uniq):   #data, tree, unique append (True/ False)
+        lst = []
+        lst1 = []
+        dtc = dt
+        if uniq:
+            for x in tr.get_children():
+                lst.append(list(tr.item(x)['values']))
+
+            for x in range(dt.shape[0]):
+                if list(dt.iloc[x]) not in lst:
+                    lst1.append(list(dt.iloc[x]))
+            dtc = pd.DataFrame(lst1)
+            
+
+        for x in range(dtc.shape[0]):
+            print("hell")
+            res = ''.join(random.choices(string.ascii_uppercase +string.digits, k = 10))
+            tr.insert(parent='',index='end', iid=str(res), values=tuple(dtc.iloc[x]), text='')
+            break
+    def TableDel(self, tr):
+        for x in tr.get_children():
+            tr.delete(x)
+
+    def TableFetch(self, tr, clm):
+        lst = []
+        for x in tr.get_children():
+            lst.append(tr.item(x)['values'])
+        return pd.DataFrame(lst, columns=clm)
+
 class Console:
     __FbObj:FireBase = None
     __root:Tk = None
@@ -50,6 +106,8 @@ class Console:
         self.cbfac.place(relx=0.02, rely=0.2)
         self.cbsub = ttk.Combobox(self.__MainFrm, values=fv3, font=self.__font)
         self.cbsub.place(relx=0.02, rely=0.25)
+
+        
 
     def enable(self):
         self.__root.mainloop()
