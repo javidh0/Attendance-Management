@@ -119,7 +119,7 @@ class Console:
         self.Tr = self.TrObj.TableDis(pd.DataFrame(), ['ID', "P/A"], 40, self.TreeFrame, False, 300)
 
     def GetAttendRec(self, hash):
-        self.__FbObj.GetRecords(hash)
+        return self.__FbObj.GetRecords(hash)
 
     def SearchAttend1(self, hash:str):
         self.TrObj.TableDel(self.Tr)
@@ -131,7 +131,7 @@ class Console:
         active = [self.__FbObj.GetActiveAttendances(Class)]
         activecb = ttk.Combobox(self.__MainFrm, values=active, font=self.__font)
         activecb.place(relx=0.5, rely=0.2, anchor=CENTER)
-        Button(self.__MainFrm, text="Search" ,font=self.__font, command=lambda : self.SearchAttend1(str(activecb.get()))).place(relx=0.75,rely=0.2, anchor=E)
+        Button(self.__MainFrm, text="Search" ,font=self.__font, command=lambda : self.init_Fetch(str(activecb.get()))).place(relx=0.75,rely=0.22, anchor=E)
     
     def MainWindowStudent(self):
         self.Tr = self.TrObj.TableDis(pd.DataFrame(), ['ID', "P/A"], 40, self.TreeFrame, False, 300)
@@ -143,6 +143,10 @@ class Console:
         self.cbclass.place(relx=0.5, rely=0.15, anchor=CENTER)
         Button(self.__MainFrm, text="Search" ,font=self.__font, command=self.SearchAttend0).place(relx=0.75,rely=0.15, anchor=E)
         
+    def init_Fetch(self, hash):
+        while True:
+            time.sleep(0.5)
+            print(self.GetAttendRec(hash))
 
     def enable(self):
         self.__root.mainloop()
