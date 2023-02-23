@@ -19,8 +19,38 @@ from email.utils import formatdate
 from email import encoders
 from PIL import Image, ImageTk
 import json
+import urllib
 
 print(str(datetime.datetime.fromtimestamp(time.time()))[:10])
+
+def InternetCheck(host='http://google.com'):
+    try:
+        urllib.request.urlopen(host)
+        return True
+    except:
+        return False
+
+class State:
+    Ardunio:bool = False
+    Internet:bool = False
+    Cam:bool = False
+    def __init__(self) -> None:
+        self.Ardunio = False
+        self.Internet = False
+    def ArduinoSet(self, state:bool):
+        self.Ardunio = state
+    def InternetSet(self, state:bool):
+        self.Internet = state
+    def CamSet(self, state:bool):
+        self.Cam = state
+    def GetArduino(self):
+        return self.Ardunio
+    def GetInternet(self):
+        return self.Internet
+    def GetCam(self):
+        return self.Cam
+
+UniversalObj = State()
 
 class Ardunio:
     pass
@@ -349,18 +379,25 @@ class Window:
         self.__root.geometry('%dx%d'%(width, height))
         self.__mainFrm = LabelFrame(self.__root)
         self.__mainFrm.place(relx=0.5, rely=0.5, anchor=CENTER, relwidth=0.99, relheight=0.99)
-        self.__FbObj = FireBase()
-        self.__FbObj.initialize()
+        try:
+            self.__FbObj = FireBase()
+            self.__FbObj.initialize()
+            UniversalObj.InternetSet(True)
+        except:
+            UniversalObj.InternetSet(False)
         self.__FaceObj = FaceRecog_
         self.__Arduino = Ardunio("COM5")
         self.ConnectArduino()
 
     def ConnectArduino(self):
         temp = self.__Arduino.Connect()
+        UniversalObj.ArduinoSet(temp)
         return temp
     
     def CheckConnect(self):
-        return self.__Arduino.isOpen()
+        temp = self.__Arduino.isOpen()
+        UniversalObj.ArduinoSet(temp)
+        return temp
 
     def __CloseAttendance(self):
         self.at_root.destroy()
@@ -411,7 +448,11 @@ class Window:
                 self.__Attendance.MarkPresent(ra)
 
     def __AttenadanceWindow(self):
-        self.__cam = cv2.VideoCapture(0)
+        try:
+            self.__cam = cv2.VideoCapture(0)
+            UniversalObj.CamSet(True)
+        except:
+            UniversalObj.CamSet(False)
         def Update(rt):
             try:
                 rt.update()
@@ -465,12 +506,29 @@ class Window:
 
         at_root.mainloop()
     def Create(self, Subject, FacultyID, Class, MailID):
+        try:
+            a = cv2.VideoCapture(0)
+            UniversalObj.CamSet(True)
+            print(True)
+        except:
+            UniversalObj.CamSet(False)
+            print(True)
         self.__MailId = MailID
         print(Subject, FacultyID, Class)
         self.__Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
         self.__FaceObj.start()
-        Button(self.__mainFrm, text="Take FaceRecognition Attendance", font=self.__font, command=self.__AttenadanceWindow).pack(pady=10)
-        Button(self.__mainFrm, text="Take Rfid Attendance", font=self.__font, command=self.__AttenadanceWindowRFID).pack(pady=10)
+        
+        self.FcBtn = Button(self.__mainFrm, text="Take FaceRecognition Attendance", font=self.__font, command=self.__AttenadanceWindow)
+        self.FcBtn.pack(pady=10)
+        self.FcBtn['state'] = DISABLED
+        self.RfBtn = Button(self.__mainFrm, text="Take Rfid Attendance", font=self.__font, command=self.__AttenadanceWindowRFID)
+        self.RfBtn.pack(pady=10)
+        self.RfBtn['state'] = DISABLED
+        if UniversalObj.GetInternet():
+            if UniversalObj.GetArduino():
+                self.RfBtn['state'] = NORMAL
+            if UniversalObj.GetCam():
+                self.FcBtn['state'] = NORMAL
         
     def __CreateAttendanceWindow(self):
         for i in self.__mainFrm.winfo_children():
@@ -498,6 +556,7 @@ class Window:
         self.MainWindow1()
 
     def MainWindow1(self):
+        UniversalObj.InternetSet(InternetCheck())
         Label(self.__mainFrm, text="SRM-Automated Attendance", font=self.__title).place(relx=0.5, rely=0.05, anchor=CENTER)
         self.btn = Button(self.__mainFrm, text="Arduino Reconnect", command=self.ConnectArduino, font=self.__font)
         self.btn.place(relx=0.98, rely=0.14, anchor=E)
@@ -510,17 +569,26 @@ class Window:
         self.btn2.place(relx=0.5, rely=0.25, anchor=CENTER)
         self.btn2['state'] = DISABLED
 
-        stat = self.CheckConnect()
+        stat = UniversalObj.GetArduino()
         if stat:
             self.btn['state'] = DISABLED
             self.btn2['state'] = NORMAL
-            Label(self.__mainFrm, text="Connected", font=self.__font, fg='green').place(relx=0.02, rely=0.175, anchor=W)
+            Label(self.__mainFrm, text="RFID Connected", font=self.__font, fg='green').place(relx=0.02, rely=0.175, anchor=W)
         else:
             self.btn['state'] = NORMAL
             self.btn2['state'] = DISABLED
-            Label(self.__mainFrm, text="Not Connected", font=self.__font, fg='red').place(relx=0.02, rely=0.175, anchor=W)
+            Label(self.__mainFrm, text="RFID Not Connected", font=self.__font, fg='red').place(relx=0.02, rely=0.175, anchor=W)
+
+        stat = UniversalObj.GetInternet()
+        if stat:
+            self.btn['state'] = DISABLED
+            self.btn2['state'] = NORMAL
+            Label(self.__mainFrm, text="DataBase Connected", font=self.__font, fg='green').place(relx=0.02, rely=0.215, anchor=W)
+        else:
+            self.btn['state'] = NORMAL
+            self.btn2['state'] = DISABLED
+            Label(self.__mainFrm, text="DataBase Not Connected", font=self.__font, fg='red').place(relx=0.02, rely=0.215, anchor=W)
+
         
-
-
     def enable(self):
         self.__root.mainloop()
