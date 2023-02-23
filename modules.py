@@ -219,6 +219,8 @@ class FireBase:
         return temp
     def Mark(self, Class:str, hash:str):
         self.__dataBase.child("Class").child(Class).child("ActiveAttendance").set({"ActiveAttendance":hash})
+    def GetActiveAttendances(self, Class:str):
+        return self.__dataBase.child("Class").child(Class).child("ActiveAttendance").get().val()["ActiveAttendance"]
 
 class Attendance:
     __FBobj:FireBase = None

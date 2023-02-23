@@ -90,11 +90,12 @@ class Console:
         self.__Date = self.__FbObj.GetDatesData()
         self.__Fac = self.__FbObj.GetFacultyData()
         self.__Sub = self.__FbObj.GetSubjectData()
+        self.__Class = self.__FbObj.GetClass()
 
     def SearchAtttendance(self):
         pass
-    
-    def MainWindow(self):
+
+    def MainWindowRecords(self):
         Label(self.__MainFrm, text="SRM-Attendance Console", font=self.__title).place(relx=0.5, rely=0.05, anchor=CENTER)
         self.GetData()
         fv1 = ['None']
@@ -116,6 +117,25 @@ class Console:
         self.cbsub.place(relx=0.02, rely=0.25)
 
         self.Tr = self.TrObj.TableDis(pd.DataFrame(), ['ID', "P/A"], 40, self.TreeFrame, False, 300)
+    
+    def SearchAttend1(self):
+        pass
+
+    def SearchAttend0(self):
+        Class = str(self.cbclass.get())
+        active = [self.__FbObj.GetActiveAttendances(Class)]
+        activecb = ttk.Combobox(self.__MainFrm, values=active, font=self.__font)
+        activecb.place(relx=0.5, rely=0.2, anchor=CENTER)
+        Button(self.__MainFrm, text="Search" ,font=self.__font, command=self.SearchAttend1).place(relx=0.75,rely=0.2, anchor=E)
+    
+    def MainWindowStudent(self):
+        Label(self.__MainFrm, text="SRM-Attendance Student's Console", font=self.__title).place(relx=0.5, rely=0.05, anchor=CENTER)
+        self.GetData()
+        fv1 = self.__Class
+        Label(self.__MainFrm, text="Active Attendances", font=self.__font).place(relx=0.5, rely=0.1, anchor=CENTER)
+        self.cbclass = ttk.Combobox(self.__MainFrm, values=fv1, font=self.__font)
+        self.cbclass.place(relx=0.5, rely=0.15, anchor=CENTER)
+        Button(self.__MainFrm, text="Search" ,font=self.__font, command=self.SearchAttend0).place(relx=0.75,rely=0.15, anchor=E)
         
 
     def enable(self):
