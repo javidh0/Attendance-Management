@@ -217,6 +217,8 @@ class FireBase:
     def GetSubjectData(self):
         temp = self.__dataBase.child("meta").child("Subject").get().val()
         return temp
+    def Mark(self, Class:str, hash:str):
+        self.__dataBase.child("Class").child(Class).child("ActiveAttendance").set({"ActiveAttendance":hash})
 
 class Attendance:
     __FBobj:FireBase = None
@@ -250,6 +252,10 @@ class Attendance:
         return str(self.__Class) +" "+ str(self.__Subject) +" "+ str(self.__date)
     def GetRecords(self):
         return self.__FBobj.GetRecords(self.__Hash)
+    def SetActive(self):
+        self.__FBobj.Mark(self.__Class, self.__Hash)
+    def Deactive(self):
+        self.__FBobj.Mark(self.__Class, "None")
 
 class FaceRecog:
     __TrainedList:list = None
@@ -408,6 +414,7 @@ class Window:
         return temp
 
     def __CloseAttendance(self):
+        self.__Attendance.Deactive()
         self.at_root.destroy()
         df = self.__Attendance.GetRecords()
         lst = list(df[df['A/P'] == 'A']['ID'])
@@ -421,6 +428,7 @@ class Window:
         print("Mail sent")
         self.__cam.release()
     def __CloseAttendance1(self):
+        self.__Attendance.Deactive()
         self.rfid_root.destroy()
         df = self.__Attendance.GetRecords()
         lst = list(df[df['A/P'] == 'A']['ID'])
@@ -435,6 +443,7 @@ class Window:
         self.__cam.release()
         
     def __AttenadanceWindowRFID(self):
+        self.__Attendance.SetActive()
         rfid_root = Tk()
         self.rfid_root = rfid_root
         rfid_root.title(self.__Attendance.GetTitle())
@@ -456,6 +465,7 @@ class Window:
                 self.__Attendance.MarkPresent(ra)
 
     def __AttenadanceWindow(self):
+        self.__Attendance.SetActive()
         try:
             self.__cam = cv2.VideoCapture(0)
             UniversalObj.CamSet(True)

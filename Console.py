@@ -80,12 +80,20 @@ class Console:
         self.__root.geometry('%dx%d'%(width, height))
         self.__mainFrm = LabelFrame(self.__root)
         self.__mainFrm.place(relx=0.5, rely=0.5, anchor=CENTER, relwidth=0.99, relheight=0.99)
+
+        self.TreeFrame = LabelFrame(self.__MainFrm)
+        self.TreeFrame.place(relx=0.5, rely=0.35, relheight=0.6, relwidth=0.98, anchor=N)
+
+        self.TrObj = Table()
     
     def GetData(self):
         self.__Date = self.__FbObj.GetDatesData()
         self.__Fac = self.__FbObj.GetFacultyData()
         self.__Sub = self.__FbObj.GetSubjectData()
 
+    def SearchAtttendance(self):
+        pass
+    
     def MainWindow(self):
         Label(self.__MainFrm, text="SRM-Attendance Console", font=self.__title).place(relx=0.5, rely=0.05, anchor=CENTER)
         self.GetData()
@@ -107,6 +115,7 @@ class Console:
         self.cbsub = ttk.Combobox(self.__MainFrm, values=fv3, font=self.__font)
         self.cbsub.place(relx=0.02, rely=0.25)
 
+        self.Tr = self.TrObj.TableDis(pd.DataFrame(), ['ID', "P/A"], 40, self.TreeFrame, False, 300)
         
 
     def enable(self):
