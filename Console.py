@@ -117,18 +117,24 @@ class Console:
         self.cbsub.place(relx=0.02, rely=0.25)
 
         self.Tr = self.TrObj.TableDis(pd.DataFrame(), ['ID', "P/A"], 40, self.TreeFrame, False, 300)
-    
-    def SearchAttend1(self):
-        pass
+
+    def GetAttendRec(self, hash):
+        self.__FbObj.GetRecords(hash)
+
+    def SearchAttend1(self, hash:str):
+        self.TrObj.TableDel(self.Tr)
+        self.TrObj.TableAppend(self.GetAttendRec(hash), self.Tr, False)
+        Button(self, text="Refresh", command=lambda : self.SearchAttend1(hash))
 
     def SearchAttend0(self):
         Class = str(self.cbclass.get())
         active = [self.__FbObj.GetActiveAttendances(Class)]
         activecb = ttk.Combobox(self.__MainFrm, values=active, font=self.__font)
         activecb.place(relx=0.5, rely=0.2, anchor=CENTER)
-        Button(self.__MainFrm, text="Search" ,font=self.__font, command=self.SearchAttend1).place(relx=0.75,rely=0.2, anchor=E)
+        Button(self.__MainFrm, text="Search" ,font=self.__font, command=lambda : self.SearchAttend1(str(activecb.get()))).place(relx=0.75,rely=0.2, anchor=E)
     
     def MainWindowStudent(self):
+        self.Tr = self.TrObj.TableDis(pd.DataFrame(), ['ID', "P/A"], 40, self.TreeFrame, False, 300)
         Label(self.__MainFrm, text="SRM-Attendance Student's Console", font=self.__title).place(relx=0.5, rely=0.05, anchor=CENTER)
         self.GetData()
         fv1 = self.__Class
