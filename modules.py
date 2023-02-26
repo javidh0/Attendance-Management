@@ -142,7 +142,6 @@ class FireBase:
         except:
             pass
         lst.append(value)
-        print(lst)
         self.__dataBase.child(path1).child(path2).child(path3).set(lst)
 
     def CreateAttendance(self, hash:str, students:tuple):    
@@ -529,10 +528,8 @@ class Window:
         try:
             a = cv2.VideoCapture(0)
             UniversalObj.CamSet(True)
-            print(True)
         except:
             UniversalObj.CamSet(False)
-            print(True)
         self.__MailId = MailID
         print(Subject, FacultyID, Class)
         self.__Attendance = Attendance(obj= self.__FbObj, Subject=Subject, FacultyID=FacultyID, Class=Class)
